@@ -24,7 +24,6 @@ export interface YearFile {
   festivals: FestivalEntry[];
   _meta?: {
     generatedAt: string;
-    source: string;
     scraperVersion: string;
   };
 }

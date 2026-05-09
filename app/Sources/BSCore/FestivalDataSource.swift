@@ -17,7 +17,13 @@ public enum FestivalDataSource {
 
     /// Base URL for the festivals API. The route validates BS year range,
     /// reads from KV, and falls back to a fresh scrape on cold cache.
+    /// Debug builds hit a local Next.js dev server so we can develop against
+    /// a fresh KV without depending on the deployed domain.
+    #if DEBUG
+    public static let baseURL = URL(string: "http://localhost:3000/api/festivals/")!
+    #else
     public static let baseURL = URL(string: "https://calendar.nabinkhair.com.np/api/festivals/")!
+    #endif
 
     private static let cacheDir: URL = {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -37,7 +43,8 @@ public enum FestivalDataSource {
     public static func refresh(year: Int) async -> Data? {
         let url = baseURL.appendingPathComponent("\(year)")
         var request = URLRequest(url: url)
-        request.timeoutInterval = 15
+        // Cold-cache scrapes upstream can take ~10 s; keep generous headroom.
+        request.timeoutInterval = 30
         request.setValue("NepaliCalendar/1.0 (macOS)", forHTTPHeaderField: "User-Agent")
 
         do {

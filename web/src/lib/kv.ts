@@ -24,19 +24,8 @@ export interface KVEntry<T> {
   hash: string;
 }
 
-export interface FestivalsMeta {
-  /** ms since epoch when the last sync run completed (regardless of changes). */
-  lastSyncAt: number;
-  /** Years touched on the most recent sync. */
-  liveWindow: number[];
-  /** Which years were rewritten on the last sync (hash changed). */
-  changedYears: number[];
-  scraperVersion: string;
-}
-
 export const KV_KEYS = {
   festivalsYear: (year: number) => `festivals-${year}`,
-  festivalsMeta: "festivals:meta",
 } as const;
 
 function endpoint(key: string): string {

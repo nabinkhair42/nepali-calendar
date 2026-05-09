@@ -2,20 +2,43 @@ import SwiftUI
 import AppKit
 import BSCore
 
-/// Root composition for the popover content. Order:
-///   MonthHeader → MonthGrid → SelectedDayPanel → FooterBar
-/// Material is applied here. Width is fixed at 360pt per v2 spec.
+/// Root composition for the popover content. Routes between the calendar
+/// and a single Settings panel that owns language, shortcuts cheatsheet,
+/// and about. State-machine swaps the body in-place so we don't open
+/// separate windows from a menu-bar app.
 ///
 /// Keyboard shortcuts (active while the popover is the key window):
-///   ⌘← / ⌘→  prev / next month         (NavPill buttons)
-///   ⌘T       jump to today              (NavPill scope button)
-///   ⌘Q       quit Nepali Calendar       (hidden binding here)
-///   ⌘K       command palette            (Tier 1.7 — disabled stub)
-///   ⌘,       settings                   (Tier 2.11 — disabled stub)
+///   ⌘← / ⌘→  prev / next month
+///   ⌘T       jump to today
+///   ⌘L       toggle language
+///   ⌘,       show / hide settings
+///   ⌘Q       quit Nepali Calendar
+///   esc      return to calendar (when on Settings)
 struct PopoverRoot: View {
     @EnvironmentObject var state: AppState
+    @State private var route: Route = .calendar
+
+    enum Route: Equatable { case calendar, settings }
 
     var body: some View {
+        Group {
+            switch route {
+            case .calendar: calendarBody
+            case .settings: SettingsView(onClose: { route = .calendar })
+            }
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+        )
+        .preferredColorScheme(nil)
+        .background(KeyboardShortcuts(route: $route))
+        .animation(.easeInOut(duration: 0.18), value: route)
+    }
+
+    private var calendarBody: some View {
         VStack(spacing: 0) {
             MonthHeader(
                 viewing: state.viewing,
@@ -47,55 +70,41 @@ struct PopoverRoot: View {
 
             Divider().opacity(0.2)
 
-            FooterBar()
+            FooterBar(onShowSettings: { route = .settings })
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
         }
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
-        )
-        .preferredColorScheme(nil)
-        .background(KeyboardShortcuts())
     }
 }
 
-/// Bottom row: locale toggle (transitional — moves to Settings when that
-/// ships), placeholders for ⌘K and ⌘, that read as disabled with help
-/// text until the underlying features land.
+/// Bottom row of the calendar view. Single labelled Settings button
+/// aligned right — owns shortcuts, language, and about behind it.
 private struct FooterBar: View {
-    @EnvironmentObject var state: AppState
+    let onShowSettings: () -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
-            LocaleToggle()
+        HStack {
             Spacer()
-            FooterIconButton(systemName: "command", isDisabled: true)
-                .help("Command palette · ⌘K (coming soon)")
-            FooterIconButton(systemName: "gearshape", isDisabled: true)
-                .help("Settings · ⌘, (coming soon)")
+            SettingsButton(action: onShowSettings)
+                .help("Settings · ⌘,")
         }
     }
 }
 
-private struct LocaleToggle: View {
-    @EnvironmentObject var state: AppState
+private struct SettingsButton: View {
+    let action: () -> Void
     @State private var hovered = false
 
     var body: some View {
-        Button {
-            state.toggleLocale()
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "character.book.closed")
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: "gearshape")
                     .font(.system(size: 11, weight: .semibold))
-                Text(state.localeMode == .nepali ? "ने" : "EN")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                Text("Settings")
+                    .font(.system(size: 12, weight: .medium))
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .fill(hovered ? Color.primary.opacity(0.12) : Color.primary.opacity(0.07))
@@ -104,51 +113,27 @@ private struct LocaleToggle: View {
         }
         .buttonStyle(.plain)
         .onHover { hovered = $0 }
-        .help(state.localeMode == .nepali ? "Switch to English" : "Switch to Nepali")
-    }
-}
-
-private struct FooterIconButton: View {
-    let systemName: String
-    var action: (() -> Void)? = nil
-    var isDisabled: Bool = false
-    @State private var hovered = false
-
-    var body: some View {
-        Button {
-            action?()
-        } label: {
-            Image(systemName: systemName)
-                .font(.system(size: 11, weight: .semibold))
-                .frame(width: 26, height: 22)
-                .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(
-                            isDisabled
-                                ? Color.primary.opacity(0.04)
-                                : (hovered ? Color.primary.opacity(0.12) : Color.primary.opacity(0.07))
-                        )
-                )
-                .opacity(isDisabled ? 0.4 : 1)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
-        .onHover { if !isDisabled { hovered = $0 } }
     }
 }
 
 /// Hidden, zero-sized buttons that own keyboard shortcuts the visible UI
-/// doesn't expose (⌘Q, plus stubs for ⌘K / ⌘, that just no-op for now).
+/// doesn't expose directly.
 private struct KeyboardShortcuts: View {
+    @Binding var route: PopoverRoot.Route
+    @EnvironmentObject var state: AppState
+
     var body: some View {
         ZStack {
             Button("Quit") { NSApp.terminate(nil) }
                 .keyboardShortcut("q", modifiers: .command)
-            Button("Command palette") { /* Tier 1.7 */ }
-                .keyboardShortcut("k", modifiers: .command)
-            Button("Settings") { /* Tier 2.11 */ }
-                .keyboardShortcut(",", modifiers: .command)
+
+            Button("Show settings") {
+                route = (route == .settings) ? .calendar : .settings
+            }
+            .keyboardShortcut(",", modifiers: .command)
+
+            Button("Toggle language") { state.toggleLocale() }
+                .keyboardShortcut("l", modifiers: .command)
         }
         .opacity(0)
         .frame(width: 0, height: 0)
