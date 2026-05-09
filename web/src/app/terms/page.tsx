@@ -15,9 +15,7 @@ export default function TermsPage() {
       <ShellWrapper>
         <article className="space-y-3 p-2">
           <header className="space-y-2">
-            <p className="text-sm tracking-[0.2em] text-muted-foreground">
-              TERMS
-            </p>
+            <p className="text-sm text-muted-foreground">Terms</p>
             <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
               Plain-language terms
             </h1>

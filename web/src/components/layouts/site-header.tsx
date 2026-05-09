@@ -22,7 +22,7 @@ const DMG_URL = "/downloads/NepaliCalendar.dmg";
  * Sticky header that shrinks into a floating pill when scrolled.
  * Mirrors the portfolio's nav rhythm:
  *   - At top: full-width 50rem strip, transparent
- *   - Scrolled: ~290px pill, glass background, soft shadow
+ *   - Scrolled: ~290px pill, glass background
  *
  * Left:  app icon + "calendar." wordmark
  * Right: Download icon, theme toggle — each tooltip + Kbd badge
@@ -51,9 +51,9 @@ export function SiteHeader() {
         transition={SPRING}
         animate={{ borderRadius: isScrolled ? 999 : 0 }}
         className={cn(
-          "flex items-center transition-[background-color,border-color,box-shadow,height] duration-200",
+          "flex items-center transition-[background-color,border-color,height] duration-200",
           isScrolled
-            ? "mt-3 h-11 w-72 justify-between gap-2.5 border bg-background/85 px-3 shadow-lg shadow-black/15 backdrop-blur-md"
+            ? "mt-3 h-11 w-72 justify-between gap-2.5 border bg-background/85 px-3 backdrop-blur-md"
             : "h-14 w-full max-w-200 justify-between gap-3 border-transparent px-2"
         )}
       >

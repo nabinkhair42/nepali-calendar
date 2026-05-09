@@ -13,6 +13,7 @@ export default function Page() {
     <div className="flex flex-col gap-12 py-8">
       <Hero />
       <Features />
+      <Previews />
       <Install />
     </div>
   );
@@ -42,8 +43,8 @@ function Hero() {
             <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
               Nepali Calendar
             </h1>
-            <p className="text-sm tracking-[0.2em] text-muted-foreground">
-              MENU&nbsp;BAR&nbsp;APP · MACOS
+            <p className="text-sm text-muted-foreground">
+              Menu bar app for macOS
             </p>
           </div>
 
@@ -105,9 +106,7 @@ function Features() {
     <ShellWrapper>
       <section className="space-y-3 p-2">
         <header className="space-y-2">
-          <p className="text-sm tracking-[0.2em] text-muted-foreground">
-            WHAT YOU GET
-          </p>
+          <p className="text-sm text-muted-foreground">What you get</p>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
             Built for daily glances
           </h2>
@@ -141,6 +140,65 @@ function Features() {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Previews                                                                  */
+/* -------------------------------------------------------------------------- */
+
+function Previews() {
+  return (
+    <ShellWrapper>
+      <section className="space-y-3 p-2">
+        <header className="space-y-2">
+          <p className="text-sm text-muted-foreground">Preview</p>
+          <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
+            Made for both modes
+          </h2>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            Follows the system theme. Switches the moment you do.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <PreviewCard src="/light.png" label="Light" />
+          <PreviewCard src="/dark.png" label="Dark" tone="dark" />
+        </div>
+      </section>
+    </ShellWrapper>
+  );
+}
+
+function PreviewCard({
+  src,
+  label,
+  tone = "light",
+}: {
+  src: string;
+  label: string;
+  tone?: "light" | "dark";
+}) {
+  return (
+    <figure className="space-y-2">
+      <div
+        className={
+          "relative aspect-812/1316 w-full overflow-hidden rounded-xl border " +
+          (tone === "dark" ? "bg-[oklch(0.16_0_0)]" : "bg-[oklch(0.97_0_0)]")
+        }
+      >
+        <Image
+          src={src}
+          alt={`Nepali Calendar in ${label.toLowerCase()} mode`}
+          fill
+          sizes="(min-width: 640px) 25rem, 100vw"
+          className="object-cover"
+        />
+      </div>
+      <figcaption className="px-1 text-xs text-muted-foreground">
+        {label}
+      </figcaption>
+    </figure>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Install                                                                   */
 /* -------------------------------------------------------------------------- */
 
@@ -149,9 +207,7 @@ function Install() {
     <ShellWrapper>
       <section id="install" className="space-y-3 p-2 scroll-mt-20">
         <header className="space-y-2">
-          <p className="text-sm tracking-[0.2em] text-muted-foreground">
-            INSTALL
-          </p>
+          <p className="text-sm text-muted-foreground">Install</p>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
             One command and you&rsquo;re set
           </h2>

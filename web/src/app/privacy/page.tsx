@@ -15,9 +15,7 @@ export default function PrivacyPage() {
       <ShellWrapper>
         <article className="space-y-3 p-2">
           <header className="space-y-2">
-            <p className="text-sm tracking-[0.2em] text-muted-foreground">
-              PRIVACY
-            </p>
+            <p className="text-sm text-muted-foreground">Privacy</p>
             <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
               What we keep, what we don&rsquo;t
             </h1>
