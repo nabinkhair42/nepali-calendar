@@ -1,31 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Kbd } from "@/components/ui/kbd";
 
 interface Props {
   /** Command to copy to clipboard. Shown verbatim with a leading "$ ". */
   command: string;
+  /** Optional shortcut key shown as a Kbd badge. */
+  shortcut?: string;
 }
 
 /**
- * Single-line terminal block with click-to-copy. Subtle "Copied" toast
- * via the button itself — no separate UI element to manage.
+ * Terminal-styled block with click-to-copy. Listens for a global
+ * `nepalicalendar:copy-install` window event so the card flashes "Copied"
+ * even when the copy was triggered by the page-level keyboard shortcut.
  */
-export function CopyCommand({ command }: Props) {
+export function CopyCommand({ command, shortcut }: Props) {
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+
+  function flashCopied() {
+    setCopied(true);
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => setCopied(false), 1600);
+  }
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      flashCopied();
     } catch {
-      // Clipboard API can fail on insecure contexts. Silently no-op.
+      // Clipboard API fails on insecure contexts; no-op.
     }
   }
 
+  useEffect(() => {
+    function onExternalCopy() {
+      flashCopied();
+    }
+    window.addEventListener("nepalicalendar:copy-install", onExternalCopy);
+    return () => {
+      window.removeEventListener("nepalicalendar:copy-install", onExternalCopy);
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   return (
-    <div className="group relative flex items-center gap-3 text-left rounded-lg border border-border bg-card pl-4 pr-1.5 py-1.5">
+    <div className="group relative flex items-center gap-3 rounded-lg border border-border bg-card pl-4 pr-1.5 py-1.5">
       <pre className="flex-1 font-mono text-[13px] leading-6 overflow-x-auto text-foreground py-1.5">
         <span className="text-muted-foreground select-none">$ </span>
         {command}
@@ -38,6 +59,7 @@ export function CopyCommand({ command }: Props) {
       >
         {copied ? <CheckIcon /> : <CopyIcon />}
         <span className="text-foreground">{copied ? "Copied" : "Copy"}</span>
+        {shortcut && !copied && <Kbd>{shortcut}</Kbd>}
       </button>
     </div>
   );

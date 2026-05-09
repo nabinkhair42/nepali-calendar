@@ -1,63 +1,27 @@
 import Image from "next/image";
-import Link from "next/link";
+import { ShellWrapper } from "@/components/layouts/shell-wrapper";
+import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
+import { CopyCommand } from "@/components/copy-command";
+import { PageShortcuts } from "@/components/page-shortcuts";
+import { Apple } from "@/components/apple-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar03Icon,
   EyeIcon,
   ShieldKeyIcon,
 } from "@hugeicons/core-free-icons";
-import { Apple } from "@/components/apple-icons";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { CopyCommand } from "@/components/copy-command";
 
 export default function Page() {
   return (
-    <main className="min-h-screen flex flex-col bg-background text-foreground">
-      <Nav />
-      <Hero />
-      <Features />
-      <Install />
-      <Footer />
-    </main>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Nav                                                                       */
-/* -------------------------------------------------------------------------- */
-
-function Nav() {
-  return (
-    <header className="sticky top-0 z-30 px-6 py-4 backdrop-blur-md bg-background/72 border-b border-border">
-      <div className="mx-auto max-w-6xl flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex items-center gap-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/30 rounded-md"
-        >
-          <Image
-            src="/icon.svg"
-            alt=""
-            width={28}
-            height={28}
-            className="w-7 h-7 rounded-lg"
-            aria-hidden
-          />
-          <span className="text-sm font-semibold tracking-tight">
-            Nepali Calendar
-          </span>
-        </Link>
-        <nav className="flex items-center gap-2 text-sm">
-          <Button asChild size="sm">
-            <a href="/downloads/NepaliCalendar.dmg" download>
-              <Apple className="w-3.5 h-3.5" />
-              Download
-            </a>
-          </Button>
-        </nav>
+    <>
+      <PageShortcuts />
+      <div className="flex flex-col gap-12 py-8">
+        <Hero />
+        <Features />
+        <Install />
       </div>
-    </header>
+    </>
   );
 }
 
@@ -67,55 +31,53 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="px-6 pt-16 pb-24 sm:pt-24 sm:pb-32">
-      <div className="mx-auto max-w-6xl grid lg:grid-cols-2 gap-16 lg:gap-12 items-center">
-        <div>
-          <Badge variant="outline" className="text-muted-foreground">
-            For macOS · Free forever
-          </Badge>
-          <h1 className="mt-5 font-heading text-5xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
-            Bikram Sambat,
-            <br />
-            in your menu bar.
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-md leading-relaxed">
-            Festivals, holidays, weekday names — in Nepali.
+    <ShellWrapper>
+      <div className="flex flex-col gap-3 p-2 md:flex-row">
+        <div className="relative size-28 shrink-0 self-start md:mt-2.5 md:size-32">
+          <Image
+            src="/icon.svg"
+            alt="Nepali Calendar app icon"
+            fill
+            sizes="(min-width: 768px) 128px, 112px"
+            priority
+            className="rounded-lg border object-cover shadow-md"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
+              Nepali Calendar
+            </h1>
+            <p className="text-sm tracking-[0.2em] text-muted-foreground">
+              MENU&nbsp;BAR&nbsp;APP · MACOS
+            </p>
+          </div>
+
+          <p className="text-base leading-relaxed text-muted-foreground">
+            Bikram Sambat in your menu bar. Festivals, public holidays, and
+            observances at a glance — native, fast, and quietly out of the
+            way until you need it.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg">
+
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <Button asChild>
               <a href="/downloads/NepaliCalendar.dmg" download>
-                <Apple className="w-4 h-4" />
-                Download for macOS
+                <Apple className="size-4" />
+                Download
+                <Kbd>D</Kbd>
+              </a>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <a href="#install">
+                Install via terminal
+                <Kbd>I</Kbd>
               </a>
             </Button>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">
-            macOS 14 Sonoma or later · Apple silicon &amp; Intel · ~400 KB
-          </p>
         </div>
-        <HeroVisual />
       </div>
-    </section>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Hero visual — app screenshot                                              */
-/* -------------------------------------------------------------------------- */
-
-function HeroVisual() {
-  return (
-    <div className="relative overflow-hidden rounded-lg border border-border ring-2 ring-foreground/5">
-      <Image
-        src="/demo.png"
-        alt="Nepali Calendar running in the macOS menu bar"
-        width={3024}
-        height={1964}
-        priority
-        sizes="(min-width: 1024px) 50vw, 100vw"
-        className="h-auto w-full"
-      />
-    </div>
+    </ShellWrapper>
   );
 }
 
@@ -124,64 +86,60 @@ function HeroVisual() {
 /* -------------------------------------------------------------------------- */
 
 function Features() {
-  return (
-    <section className="px-6 py-24 sm:py-32 border-t border-border">
-      <div className="mx-auto max-w-6xl">
-        <div className="max-w-2xl">
-          <Badge variant="outline" className="text-muted-foreground">
-            What you get
-          </Badge>
-          <h2 className="mt-4 font-heading text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">
-            Built for daily glances,
-            <br />
-            not weekend planning.
-          </h2>
-        </div>
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <FeatureCard
-            icon={EyeIcon}
-            title="One click away"
-            body="Lives in your menu bar. Click anywhere else to dismiss."
-          />
-          <FeatureCard
-            icon={Calendar03Icon}
-            title="Festivals you celebrate"
-            body="Public holidays and observances, color-coded by category."
-          />
-          <FeatureCard
-            icon={ShieldKeyIcon}
-            title="Native, private, free"
-            body="Built in Swift. No accounts, no telemetry."
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
+  const items = [
+    {
+      icon: EyeIcon,
+      title: "One click away",
+      tagline: "Lives in your menu bar. Click anywhere else to dismiss.",
+    },
+    {
+      icon: Calendar03Icon,
+      title: "Festivals you celebrate",
+      tagline: "Public holidays and observances, color-coded by category.",
+    },
+    {
+      icon: ShieldKeyIcon,
+      title: "Native, private, free",
+      tagline: "Built in Swift. No accounts, no telemetry.",
+    },
+  ];
 
-function FeatureCard({
-  icon,
-  title,
-  body,
-}: {
-  icon: typeof EyeIcon;
-  title: string;
-  body: string;
-}) {
   return (
-    <Card className="shadow-none transition-colors hover:ring-primary/30">
-      <CardContent>
-        <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
-          <HugeiconsIcon icon={icon} size={20} strokeWidth={1.75} />
+    <ShellWrapper>
+      <section className="space-y-3 p-2">
+        <header className="space-y-2">
+          <p className="text-sm tracking-[0.2em] text-muted-foreground">
+            WHAT YOU GET
+          </p>
+          <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
+            Built for daily glances
+          </h2>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            Three things, done well.
+          </p>
+        </header>
+
+        <div className="flex flex-col">
+          {items.map((item, idx) => (
+            <div
+              key={item.title}
+              className={
+                "flex items-start gap-3 py-4" +
+                (idx < items.length - 1 ? " border-b border-border" : "")
+              }
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-md border bg-muted text-foreground">
+                <HugeiconsIcon icon={item.icon} size={18} strokeWidth={1.6} />
+              </span>
+              <div className="space-y-0.5 pt-0.5">
+                <h3 className="text-lg font-medium md:text-xl">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.tagline}</p>
+              </div>
+            </div>
+          ))}
         </div>
-        <h3 className="mt-5 font-heading text-lg font-semibold tracking-tight text-foreground">
-          {title}
-        </h3>
-        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-          {body}
-        </p>
-      </CardContent>
-    </Card>
+      </section>
+    </ShellWrapper>
   );
 }
 
@@ -191,40 +149,26 @@ function FeatureCard({
 
 function Install() {
   return (
-    <section
-      id="install"
-      className="px-6 py-24 sm:py-32 border-t border-border"
-    >
-      <div className="mx-auto max-w-2xl text-center">
-        <Badge variant="outline" className="text-muted-foreground">
-          Install
-        </Badge>
-        <h2 className="mt-4 font-heading text-3xl sm:text-4xl font-semibold tracking-tight">
-          One command and you&rsquo;re set.
-        </h2>
-        <p className="mt-4 text-muted-foreground">
-          Paste, run, done.
-        </p>
+    <ShellWrapper>
+      <section id="install" className="space-y-3 p-2 scroll-mt-20">
+        <header className="space-y-2">
+          <p className="text-sm tracking-[0.2em] text-muted-foreground">
+            INSTALL
+          </p>
+          <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
+            One command and you&rsquo;re set
+          </h2>
+          <p className="text-base leading-relaxed text-muted-foreground">
+            Paste, run, done. The script downloads the disk image, copies the
+            app into Applications, and tells macOS you trust the source.
+          </p>
+        </header>
 
-        <div className="mt-8">
-          <CopyCommand command="curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Footer                                                                    */
-/* -------------------------------------------------------------------------- */
-
-function Footer() {
-  return (
-    <footer className="px-6 py-10 border-t border-border text-xs text-muted-foreground">
-      <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-3">
-        <span>Made by Nabin Khair.</span>
-        <span>© {new Date().getFullYear()} · All rights reserved</span>
-      </div>
-    </footer>
+        <CopyCommand
+          command="curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash"
+          shortcut="I"
+        />
+      </section>
+    </ShellWrapper>
   );
 }
