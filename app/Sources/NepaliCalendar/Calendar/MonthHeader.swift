@@ -16,7 +16,7 @@ struct MonthHeader: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(NepaliFormatter.headerLabel(viewing, locale: locale))
                     .font(.display)
-                    .fontWeight(.bold)
+                    .tracking(-0.4)
                     .foregroundStyle(Color.fgPrimary)
                 Text(NepaliFormatter.adSubtitle(forBSMonth: viewing))
                     .font(.label)

@@ -62,7 +62,6 @@ struct PopoverRoot: View {
 
             SelectedDayPanel(
                 date: state.selected,
-                today: state.today,
                 locale: state.localeMode
             )
             .padding(.horizontal, 16)

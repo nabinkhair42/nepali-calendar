@@ -9,7 +9,6 @@ import BSCore
 /// (Tier 1.2, 1.5, and 2.12 respectively).
 struct SelectedDayPanel: View {
     let date: BSDate
-    let today: BSDate
     let locale: Locale_
 
     @EnvironmentObject private var festivalDB: FestivalDatabase
@@ -37,7 +36,6 @@ struct SelectedDayPanel: View {
     }
 
     private var festivals: [Festival] { festivalDB.festivals(on: date) }
-    private var isToday: Bool { date == today }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -45,16 +43,6 @@ struct SelectedDayPanel: View {
                 Text(weekdayName)
                     .font(.title)
                     .foregroundStyle(Color.fgPrimary)
-                if isToday {
-                    Text("Today")
-                        .font(.caption)
-                        .foregroundStyle(Color.accentToday)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            Capsule().fill(Color.accentToday.opacity(0.12))
-                        )
-                }
                 Spacer(minLength: 4)
                 Text(adDateString)
                     .font(.label)
@@ -82,19 +70,44 @@ private struct FestivalRow: View {
     let festival: Festival
     let locale: Locale_
 
+    private var tintColor: Color {
+        festival.isHoliday ? Color.accentHoliday : festival.category.observanceDotColor
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             Circle()
-                .fill(festival.isHoliday ? Color.accentHoliday : festival.category.observanceDotColor)
-                .frame(width: 6, height: 6)
+                .fill(tintColor)
+                .frame(width: 7, height: 7)
             Text(festival.name(locale: locale))
                 .font(.label)
                 .foregroundStyle(Color.fgPrimary)
                 .lineLimit(1)
             Spacer(minLength: 4)
-            Text(festival.isHoliday ? "Holiday" : "Observance")
-                .font(.caption)
-                .foregroundStyle(Color.fgSecondary)
+            TagChip(
+                text: festival.isHoliday ? "Holiday" : "Observance",
+                tint: tintColor
+            )
         }
+    }
+}
+
+private struct TagChip: View {
+    let text: String
+    let tint: Color
+    var body: some View {
+        Text(text)
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(
+                Capsule()
+                    .fill(tint.opacity(0.10))
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(tint.opacity(0.18), lineWidth: 0.5)
+            )
     }
 }
