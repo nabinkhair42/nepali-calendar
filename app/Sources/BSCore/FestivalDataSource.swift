@@ -3,8 +3,9 @@ import Foundation
 /// Two-tier loader for `festivals-<year>.json`:
 ///
 ///   1. **Cache** — `~/Library/Application Support/NepaliCalendar/cache/`
-///   2. **Network** — `https://calendar.nabinkhair.com.np/data/festivals-<year>.json`,
-///      kept fresh by `.github/workflows/scrape-festivals.yml`
+///   2. **Network** — `https://calendar.nabinkhair.com.np/api/festivals/<year>`.
+///      The route fronts a Cloudflare-KV-backed live scrape of ashesh.com.np
+///      so any BS year resolves on demand without a redeploy.
 ///
 /// `loadCached` is synchronous and used at boot. `refresh` runs in the
 /// background and writes to cache; the caller decides when to re-parse.
@@ -14,10 +15,9 @@ import Foundation
 /// every subsequent launch — online or off — sees the full festival list.
 public enum FestivalDataSource {
 
-    /// Where the GitHub-Actions-scraped JSON is published. The web project
-    /// auto-deploys to Vercel on every push, so commits made by the workflow
-    /// reach this URL within ~30s of the cron run.
-    public static let baseURL = URL(string: "https://calendar.nabinkhair.com.np/data/")!
+    /// Base URL for the festivals API. The route validates BS year range,
+    /// reads from KV, and falls back to a fresh scrape on cold cache.
+    public static let baseURL = URL(string: "https://calendar.nabinkhair.com.np/api/festivals/")!
 
     private static let cacheDir: URL = {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -35,7 +35,7 @@ public enum FestivalDataSource {
     /// errors and non-200 responses also return nil — callers should treat
     /// nil as "nothing changed, keep using current data."
     public static func refresh(year: Int) async -> Data? {
-        let url = baseURL.appendingPathComponent("festivals-\(year).json")
+        let url = baseURL.appendingPathComponent("\(year)")
         var request = URLRequest(url: url)
         request.timeoutInterval = 15
         request.setValue("NepaliCalendar/1.0 (macOS)", forHTTPHeaderField: "User-Agent")

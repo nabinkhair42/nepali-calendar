@@ -9,8 +9,8 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { scrapeYear } from "./ashesh";
-import type { YearFile } from "./types";
+import { scrapeYear } from "../src/lib/scraper/ashesh";
+import type { YearFile } from "../src/lib/scraper/types";
 
 const SCRAPER_VERSION = "1";
 const SOURCE = "ashesh.com.np";

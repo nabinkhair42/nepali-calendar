@@ -7,11 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scrape": "tsx scripts/scrape.ts"
+    "scrape": "tsx scripts/scrape.ts",
+    "backfill": "tsx scripts/backfill.ts"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.2",
     "@hugeicons/react": "^1.1.6",
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.4.5",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
@@ -21,7 +24,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cheerio": "^1.2.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
