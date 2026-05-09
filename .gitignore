@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+*.swp
+
+# Claude Code
+.claude/settings.local.json
+.claude/projects/
+
+# Swift / Xcode
+app/.build/
+app/build/
+app/.swiftpm/
+app/Package.resolved
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel/
+web/.turbo/
+web/dist/
+web/build/
+web/coverage/
+web/*.log
+
+# Env
+.env
+.env.local
+.env.*.local

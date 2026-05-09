@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fafafb;
+  --foreground: #0b0b0c;
+  --muted: #6b6b73;
+  --accent: #d23548;
+  --accent-soft: #fbe7eb;
+  --border: rgba(11, 11, 12, 0.08);
+  --glass: rgba(255, 255, 255, 0.55);
+  --glass-strong: rgba(255, 255, 255, 0.78);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #07070a;
+    --foreground: #f1f1f3;
+    --muted: #a1a1aa;
+    --accent: #ff5e72;
+    --accent-soft: rgba(255, 94, 114, 0.14);
+    --border: rgba(255, 255, 255, 0.08);
+    --glass: rgba(28, 28, 32, 0.45);
+    --glass-strong: rgba(28, 28, 32, 0.7);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.glass-bg {
+  background:
+    radial-gradient(40% 50% at 12% 18%, rgba(210, 53, 72, 0.18), transparent 60%),
+    radial-gradient(35% 40% at 88% 22%, rgba(40, 100, 220, 0.18), transparent 60%),
+    radial-gradient(45% 55% at 50% 95%, rgba(255, 200, 80, 0.14), transparent 60%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-bg {
+    background:
+      radial-gradient(40% 50% at 12% 18%, rgba(255, 94, 114, 0.18), transparent 60%),
+      radial-gradient(35% 40% at 88% 22%, rgba(80, 140, 255, 0.18), transparent 60%),
+      radial-gradient(45% 55% at 50% 95%, rgba(255, 200, 80, 0.10), transparent 60%);
+  }
+}
+
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: saturate(140%) blur(18px);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  border: 1px solid var(--border);
+}
+
+.glass-strong {
+  background: var(--glass-strong);
+  backdrop-filter: saturate(160%) blur(22px);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  border: 1px solid var(--border);
+}

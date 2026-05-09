@@ -1,0 +1,54 @@
+import Foundation
+import SwiftUI
+import Combine
+import BSCore
+
+@MainActor
+final class AppState: ObservableObject {
+    @Published var today: BSDate
+    @Published var viewing: BSDate           // first-of-month being shown
+    @Published var localeMode: Locale_
+
+    private var tickTimer: Timer?
+
+    init() {
+        let now = Date()
+        let bs = (try? BSConverter.toBS(now)) ?? BSDate(year: 2082, month: 1, day: 1)
+        self.today = bs
+        self.viewing = BSDate(year: bs.year, month: bs.month, day: 1)
+        // Persist locale choice.
+        if let raw = UserDefaults.standard.string(forKey: "localeMode"), raw == "nepali" {
+            self.localeMode = .nepali
+        } else {
+            self.localeMode = .english
+        }
+        scheduleMidnightTick()
+    }
+
+    func goPrev() { viewing = viewing.adding(months: -1) }
+    func goNext() { viewing = viewing.adding(months: 1) }
+    func goToday() { viewing = BSDate(year: today.year, month: today.month, day: 1) }
+
+    func toggleLocale() {
+        localeMode = (localeMode == .english) ? .nepali : .english
+        UserDefaults.standard.set(localeMode == .nepali ? "nepali" : "english", forKey: "localeMode")
+    }
+
+    /// Refresh `today` at the next local midnight so the highlighted cell stays current.
+    private func scheduleMidnightTick() {
+        let cal = Calendar.current
+        let now = Date()
+        guard let nextMidnight = cal.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 5), matchingPolicy: .nextTime) else { return }
+        let interval = nextMidnight.timeIntervalSince(now)
+        tickTimer?.invalidate()
+        tickTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self else { return }
+                if let bs = try? BSConverter.toBS(Date()) {
+                    self.today = bs
+                }
+                self.scheduleMidnightTick()
+            }
+        }
+    }
+}
