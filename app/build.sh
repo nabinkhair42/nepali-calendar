@@ -25,7 +25,12 @@ mkdir -p "$MACOS" "$RES"
 cp "$BIN" "$MACOS/$APP_NAME"
 cp "$ROOT/Info.plist" "$CONTENTS/Info.plist"
 
-# Optional resources (icons etc.)
+# App icon. Regenerate with `bash icon.sh` after editing web/public/icon.svg.
+if [ -f "$ROOT/AppIcon.icns" ]; then
+    cp "$ROOT/AppIcon.icns" "$RES/AppIcon.icns"
+fi
+
+# Optional resources (fonts, etc.)
 if [ -d "$ROOT/Resources" ] && [ -n "$(ls -A "$ROOT/Resources" 2>/dev/null || true)" ]; then
     cp -R "$ROOT/Resources/." "$RES/"
 fi

@@ -13,11 +13,16 @@ export const metadata: Metadata = {
   description:
     "Bikram Sambat in your menu bar. A clean, native macOS calendar that lives one click away. Free forever.",
   metadataBase: new URL("https://calendar.nabinkhair.com.np"),
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/icon.svg",
+  },
   openGraph: {
     title: "Nepali Calendar — macOS Menu Bar App",
     description:
       "Bikram Sambat in your menu bar. A clean, native macOS calendar that lives one click away.",
     type: "website",
+    images: [{ url: "/icon.svg", width: 1024, height: 1024 }],
   },
 };
 

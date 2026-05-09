@@ -36,9 +36,14 @@ function Nav() {
           href="/"
           className="flex items-center gap-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/30 rounded-md"
         >
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary">
-            <HugeiconsIcon icon={Calendar03Icon} size={16} strokeWidth={1.75} />
-          </span>
+          <Image
+            src="/icon.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="w-7 h-7 rounded-lg"
+            aria-hidden
+          />
           <span className="text-sm font-semibold tracking-tight">
             Nepali Calendar
           </span>
