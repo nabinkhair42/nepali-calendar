@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Nepali Calendar — macOS Menu Bar App",
   description:
     "Bikram Sambat in your menu bar. A clean, native macOS calendar that lives one click away. Free forever.",
-  metadataBase: new URL("https://nepali-calendar.app"),
+  metadataBase: new URL("https://calendar.nabinkhair.com.np"),
   openGraph: {
     title: "Nepali Calendar — macOS Menu Bar App",
     description:

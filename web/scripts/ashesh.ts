@@ -10,7 +10,7 @@ const BASE = "https://www.ashesh.com.np/nepali-calendar/";
 const HOLIDAY_COLOR = "#FF4D00"; // Ashesh's red for public holidays
 const OBSERVANCE_COLOR = "#89BB0E"; // green for awareness/international days
 
-const UA = "NepaliCalendarBot/1.0 (+https://nepali-calendar.app; once-daily)";
+const UA = "NepaliCalendarBot/1.0 (+https://calendar.nabinkhair.com.np; once-daily)";
 
 interface RawEvent {
   name: string;

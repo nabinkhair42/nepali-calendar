@@ -9,12 +9,12 @@ import Combine
 ///   2. **Yearly** — lunar-anchored or AD-anchored events whose BS day
 ///      shifts each year (Dashain, Tihar, Buddha Jayanti, Holi, …).
 ///      Loaded from `festivals-<year>.json` via `FestivalDataSource` —
-///      cache → bundle → network, in that order.
+///      cache first, then a network refresh keeps things current.
 ///
-/// `bootstrap(years:)` runs synchronously at app launch from cache+bundle,
-/// then a background `refresh(years:)` fetches fresh JSON and re-parses.
-/// Because this is an `ObservableObject`, any view holding a reference will
-/// redraw automatically when the table updates.
+/// `bootstrap(years:)` runs synchronously at app launch from the on-disk
+/// cache, then a background `refresh(years:)` fetches fresh JSON and
+/// re-parses. Because this is an `ObservableObject`, any view holding a
+/// reference will redraw automatically when the table updates.
 @MainActor
 public final class FestivalDatabase: ObservableObject {
 
@@ -44,12 +44,13 @@ public final class FestivalDatabase: ObservableObject {
 
     // MARK: - Bootstrap & refresh
 
-    /// Populate the table for the given years from cache + bundle. Synchronous
-    /// because the app needs festival data on first frame; both sources are
-    /// local file reads.
+    /// Populate the table for the given years from the on-disk cache.
+    /// Synchronous because the app needs festival data on first frame, and
+    /// the cache is a local file read. On a brand-new install the cache is
+    /// empty — the background `refresh` populates it shortly after.
     public func bootstrap(years: [Int]) {
         for year in years {
-            if let data = FestivalDataSource.loadCachedOrBundled(year: year),
+            if let data = FestivalDataSource.loadCached(year: year),
                let entries = Self.parse(data: data, forYear: year) {
                 yearlyTable[year] = entries
             }

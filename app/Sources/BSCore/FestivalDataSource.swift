@@ -1,32 +1,33 @@
 import Foundation
 
-/// Three-tier loader for `festivals-<year>.json`:
+/// Two-tier loader for `festivals-<year>.json`:
 ///
 ///   1. **Cache** — `~/Library/Application Support/NepaliCalendar/cache/`
-///   2. **Bundle** — frozen snapshot shipped with the app (offline first-run)
-///   3. **Network** — `https://nepali-calendar.app/data/festivals-<year>.json`,
+///   2. **Network** — `https://calendar.nabinkhair.com.np/data/festivals-<year>.json`,
 ///      kept fresh by `.github/workflows/scrape-festivals.yml`
 ///
-/// `loadCachedOrBundled` is synchronous and used at boot. `refresh` runs in
-/// the background and writes to cache; the caller decides when to re-parse.
+/// `loadCached` is synchronous and used at boot. `refresh` runs in the
+/// background and writes to cache; the caller decides when to re-parse.
+///
+/// First launch with no internet shows only the hard-coded recurring
+/// national days (6 entries). Any successful refresh fills the cache, so
+/// every subsequent launch — online or off — sees the full festival list.
 public enum FestivalDataSource {
 
     /// Where the GitHub-Actions-scraped JSON is published. The web project
     /// auto-deploys to Vercel on every push, so commits made by the workflow
     /// reach this URL within ~30s of the cron run.
-    public static let baseURL = URL(string: "https://nepali-calendar.app/data/")!
+    public static let baseURL = URL(string: "https://calendar.nabinkhair.com.np/data/")!
 
     private static let cacheDir: URL = {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return support.appendingPathComponent("NepaliCalendar/cache", isDirectory: true)
     }()
 
-    /// Best bytes available without touching the network. Tries cache first
-    /// (which wins if any prior launch has refreshed), then falls back to
-    /// the bundled resource. Returns nil only if neither exists.
-    public static func loadCachedOrBundled(year: Int) -> Data? {
-        if let cached = readCache(year: year) { return cached }
-        return readBundled(year: year)
+    /// Bytes from the on-disk cache, or nil if no prior refresh has succeeded.
+    public static func loadCached(year: Int) -> Data? {
+        let url = cacheDir.appendingPathComponent("festivals-\(year).json")
+        return try? Data(contentsOf: url)
     }
 
     /// Fetch fresh JSON from the network and write it to cache. Returns the
@@ -59,20 +60,6 @@ public enum FestivalDataSource {
         } catch {
             return nil
         }
-    }
-
-    // MARK: - Internals
-
-    private static func readCache(year: Int) -> Data? {
-        let url = cacheDir.appendingPathComponent("festivals-\(year).json")
-        return try? Data(contentsOf: url)
-    }
-
-    private static func readBundled(year: Int) -> Data? {
-        guard let url = Bundle.module.url(forResource: "festivals-\(year)", withExtension: "json") else {
-            return nil
-        }
-        return try? Data(contentsOf: url)
     }
 
     /// Minimal shape for validation only — full parse happens in FestivalDatabase.
