@@ -1,0 +1,44 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:nepali-calendar}/app",
+      "name": "Debug NepaliCalendar (app)",
+      "target": "NepaliCalendar",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug NepaliCalendar (app)"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:nepali-calendar}/app",
+      "name": "Release NepaliCalendar (app)",
+      "target": "NepaliCalendar",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release NepaliCalendar (app)"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:nepali-calendar}/app",
+      "name": "Debug NepaliCalendarVerify (app)",
+      "target": "NepaliCalendarVerify",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug NepaliCalendarVerify (app)"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:nepali-calendar}/app",
+      "name": "Release NepaliCalendarVerify (app)",
+      "target": "NepaliCalendarVerify",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release NepaliCalendarVerify (app)"
+    }
+  ]
+}

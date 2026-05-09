@@ -1,0 +1,143 @@
+{
+  "year": 2083,
+  "_source": "Nepal Gazette Falgun 18, 2082 (MoHA), via CollegeNP. Verified against multiple patro sources.",
+  "_note": "Recurring fixed-BS-day national days (New Year 1/1, Republic Day 2/15, Constitution Day 6/3, Maghe Sankranti 10/1, Martyrs' Day 10/16, Democracy Day 11/7) are encoded in BSCore.FestivalDatabase.recurring and not duplicated here.",
+  "festivals": [
+    {
+      "month": 1,  "day": 18,
+      "nameEN": "Buddha Jayanti",
+      "nameNE": "बुद्ध जयन्ती",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 1,  "day": 18,
+      "nameEN": "Labour Day",
+      "nameNE": "श्रमिक दिवस",
+      "category": "international",
+      "isHoliday": true
+    },
+    {
+      "month": 5,  "day": 12,
+      "nameEN": "Janai Purnima",
+      "nameNE": "जनै पूर्णिमा",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 5,  "day": 13,
+      "nameEN": "Gai Jatra",
+      "nameNE": "गाईजात्रा",
+      "category": "regional",
+      "isHoliday": false
+    },
+    {
+      "month": 5,  "day": 19,
+      "nameEN": "Krishna Janmashtami",
+      "nameNE": "कृष्ण जन्माष्टमी",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 6,  "day": 9,
+      "nameEN": "Indra Jatra",
+      "nameNE": "इन्द्र जात्रा",
+      "category": "regional",
+      "isHoliday": false
+    },
+    {
+      "month": 6,  "day": 25,
+      "nameEN": "Ghatasthapana",
+      "nameNE": "घटस्थापना",
+      "category": "religious",
+      "isHoliday": false
+    },
+    {
+      "month": 6,  "day": 31,
+      "endMonth": 7,  "endDay": 6,
+      "nameEN": "Dashain",
+      "nameNE": "दशैं",
+      "category": "national",
+      "isHoliday": true
+    },
+    {
+      "month": 7,  "day": 22,
+      "endDay": 26,
+      "nameEN": "Tihar",
+      "nameNE": "तिहार",
+      "category": "national",
+      "isHoliday": true
+    },
+    {
+      "month": 7,  "day": 29,
+      "nameEN": "Chhath",
+      "nameNE": "छठ पर्व",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 9,  "day": 9,
+      "nameEN": "Yomari Punhi",
+      "nameNE": "यो मरि पुन्ही",
+      "category": "regional",
+      "isHoliday": false
+    },
+    {
+      "month": 9,  "day": 10,
+      "nameEN": "Christmas",
+      "nameNE": "क्रिसमस",
+      "category": "international",
+      "isHoliday": true
+    },
+    {
+      "month": 9,  "day": 15,
+      "nameEN": "Tamu Lhosar",
+      "nameNE": "तामु लोसार",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 10, "day": 24,
+      "nameEN": "Sonam Lhosar",
+      "nameNE": "सोनाम लोसार",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 11, "day": 22,
+      "nameEN": "Maha Shivaratri",
+      "nameNE": "महाशिवरात्री",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 11, "day": 24,
+      "nameEN": "International Women's Day",
+      "nameNE": "अन्तर्राष्ट्रिय महिला दिवस",
+      "category": "international",
+      "isHoliday": false
+    },
+    {
+      "month": 11, "day": 25,
+      "nameEN": "Gyalpo Lhosar",
+      "nameNE": "ग्यालपो लोसार",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 12, "day": 7,
+      "endDay": 8,
+      "nameEN": "Holi",
+      "nameNE": "फाग पूर्णिमा",
+      "category": "religious",
+      "isHoliday": true
+    },
+    {
+      "month": 12, "day": 23,
+      "nameEN": "Ghode Jatra",
+      "nameNE": "घोडे जात्रा",
+      "category": "regional",
+      "isHoliday": false
+    }
+  ]
+}

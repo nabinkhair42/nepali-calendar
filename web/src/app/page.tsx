@@ -1,55 +1,52 @@
-import { AppPreview } from "@/components/AppPreview";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  StarIcon,
+  Tick02Icon,
+  EyeIcon,
+  Calendar03Icon,
+  TranslationIcon,
+  CommandIcon,
+} from "@hugeicons/core-free-icons";
 
-const REPO_URL = "https://github.com/nabinkhair42/nepali-calendar";
-const BREW_TAP = "brew install --cask nabinkhair42/tap/nepali-calendar";
+import { AppPreview } from "@/components/AppPreview";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Apple } from "@/components/apple-icons";
+
+const BREW_TAP = "brew install --cask nepali-calendar";
+const APP_VERSION = "v1.0";
 
 export default function Home() {
   return (
-    <main className="relative isolate flex-1 overflow-hidden">
-      <BackgroundDecor />
-      <Nav />
-      <Hero />
+    <main className="relative isolate flex-1">
+      <div className="relative min-h-svh flex flex-col">
+        <Nav />
+        <Hero />
+      </div>
       <Features />
       <Install />
-      <Footer />
     </main>
-  );
-}
-
-function BackgroundDecor() {
-  return (
-    <>
-      <div
-        aria-hidden
-        className="glass-bg absolute inset-0 -z-10 opacity-90 pointer-events-none"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-[60vh] bg-gradient-to-b from-transparent to-(--background) pointer-events-none"
-      />
-    </>
   );
 }
 
 function Nav() {
   return (
-    <header className="mx-auto max-w-6xl px-6 lg:px-8 pt-6 flex items-center">
-      <a href="#" className="flex items-center gap-2 font-semibold tracking-tight">
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-(--accent) text-white text-[13px] font-semibold shadow-[0_4px_14px_-2px_rgba(210,53,72,0.45)]">
+    <header className="mx-auto w-full max-w-6xl px-6 lg:px-8 pt-6 flex items-center">
+      <a
+        href="#"
+        className="focus-ring flex items-center gap-2 font-semibold tracking-tight rounded-md"
+      >
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-(--accent) text-white text-[13px] font-semibold">
           ने
         </span>
         <span>Nepali Calendar</span>
+        <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-md text-[10px] font-medium tracking-wider text-(--muted) border border-(--border)">
+          {APP_VERSION}
+        </span>
       </a>
       <div className="ml-auto flex items-center gap-2 text-sm">
         <a
-          href={REPO_URL}
-          className="px-3 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/6 text-(--muted) hover:text-(--foreground) transition"
-        >
-          GitHub
-        </a>
-        <a
           href="#install"
-          className="px-3 py-1.5 rounded-md bg-(--foreground) text-(--background) hover:opacity-90 transition"
+          className="focus-ring px-3 py-1.5 rounded-md bg-(--foreground) text-(--background) hover:opacity-90 transition"
         >
           Download
         </a>
@@ -60,47 +57,44 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="mx-auto max-w-6xl px-6 lg:px-8 pt-20 lg:pt-28 pb-20 grid lg:grid-cols-2 gap-16 items-center">
-      <div>
-        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs glass-card mb-6">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-(--accent)" />
-          <span className="text-(--muted)">macOS 14 + · 376 KB · open source</span>
+    <section className="flex-1 flex items-center">
+      <div className="w-full mx-auto max-w-6xl px-6 lg:px-8 py-16 grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="lg:col-span-6">
+          <h1 className="text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">
+            Nepal lives in
+            <br />
+            your menu bar.
+          </h1>
+          <p className="mt-6 text-lg text-(--muted) max-w-md leading-relaxed">
+            A clean, native macOS app that keeps the Bikram Sambat calendar a
+            glance away. Today&apos;s date in the menu bar. The full month, one
+            click below.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <a
+              href="#install"
+              className="focus-ring inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-(--foreground) text-(--background) font-medium hover:opacity-90 transition"
+            >
+              <Apple className="w-4 h-4" aria-hidden />
+              Download for macOS
+            </a>
+            <span className="text-sm text-(--muted)">.dmg · free</span>
+          </div>
+          <div className="mt-8 flex flex-col gap-2.5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-(--muted)">
+              <Trust>No telemetry</Trust>
+              <Trust>Signed &amp; notarized</Trust>
+              <Trust>Free forever</Trust>
+            </div>
+            <div className="text-[11px] text-(--muted)/70 tracking-wide">
+              Devanagari + English · Sun &amp; Sat weekend
+            </div>
+          </div>
         </div>
-        <h1 className="text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">
-          Nepal lives in
-          <br />
-          your menu bar.
-        </h1>
-        <p className="mt-6 text-lg text-(--muted) max-w-md leading-relaxed">
-          A clean, native macOS app that keeps the Bikram Sambat calendar a
-          glance away. Today&apos;s date in the menu bar. The full month, one
-          click below.
-        </p>
-        <div className="mt-9 flex flex-wrap gap-3">
-          <a
-            href="#install"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-(--foreground) text-(--background) font-medium hover:opacity-90 transition"
-          >
-            Download for macOS
-            <span className="opacity-60 text-sm">·</span>
-            <span className="text-sm opacity-70">.dmg · free</span>
-          </a>
-          <a
-            href={REPO_URL}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl glass-card font-medium hover:opacity-90 transition"
-          >
-            <GitHubIcon />
-            <span>Star on GitHub</span>
-          </a>
-        </div>
-        <p className="mt-6 text-xs text-(--muted)">
-          BS dates 1975 – 2099 · Devanagari + English · No tracking · MIT
-        </p>
-      </div>
 
-      <div className="relative">
-        <div className="absolute -inset-12 -z-10 rounded-[64px] bg-gradient-to-br from-(--accent-soft) to-transparent blur-2xl opacity-80" />
-        <AppPreview />
+        <div className="lg:col-span-6 flex items-center justify-center">
+          <AppPreview />
+        </div>
       </div>
     </section>
   );
@@ -110,44 +104,57 @@ function Features() {
   const items = [
     {
       title: "Always at a glance",
-      body: "Today's BS date sits quietly in your menu bar — no animations, no badges, no nag.",
-      glyph: "👁",
+      body: "Today's BS date sits quietly in your menu bar. No animations, no badges, no nag.",
+      icon: EyeIcon,
     },
     {
       title: "Full month, one click",
-      body: "A clean Liquid Glass popover with the full Bikram Sambat month and matching AD dates.",
-      glyph: "🗓",
+      body: "A clean popover with the full Bikram Sambat month and matching AD dates, weekend tinted.",
+      icon: Calendar03Icon,
     },
     {
       title: "Devanagari or English",
       body: "Toggle the script with one tap. Numerals, weekdays, and month names all switch in step.",
-      glyph: "अ",
+      icon: TranslationIcon,
     },
     {
       title: "Tiny and native",
-      body: "376 KB. Pure SwiftUI. Uses Apple's MenuBarExtra and SMAppService — no Electron, no extras.",
-      glyph: "⌘",
+      body: "376 KB. Pure SwiftUI. Uses Apple's MenuBarExtra and SMAppService. No Electron, no extras.",
+      icon: CommandIcon,
     },
   ];
   return (
-    <section className="mx-auto max-w-6xl px-6 lg:px-8 py-20 border-t border-(--border)">
-      <h2 className="text-3xl font-semibold tracking-tight">
-        Quietly useful, every day.
-      </h2>
-      <p className="mt-3 text-(--muted) max-w-xl">
-        v1 is intentionally minimal. The point is to know what date it is in the
-        Nepali calendar without breaking your flow.
-      </p>
-      <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {items.map((it) => (
-          <div
-            key={it.title}
-            className="glass-card rounded-2xl p-6 hover:translate-y-[-2px] transition"
+    <section className="mx-auto max-w-6xl px-6 lg:px-8 pt-32 pb-24">
+      <div className="max-w-2xl">
+        <span className="eyebrow">What it does</span>
+        <h2 className="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight">
+          Quietly useful, every day.
+        </h2>
+        <p className="mt-4 text-(--muted) leading-relaxed">
+          v1 is intentionally minimal. The point is to know what date it is in
+          the Nepali calendar without breaking your flow.
+        </p>
+      </div>
+      <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {items.map(({ title, body, icon }, i) => (
+          <article
+            key={title}
+            className="group glass-card rounded-2xl p-7 min-h-[15rem] flex flex-col transition-all duration-300 hover:-translate-y-0.5 hover:border-(--accent)/30"
           >
-            <div className="text-2xl">{it.glyph}</div>
-            <div className="mt-4 font-semibold tracking-tight">{it.title}</div>
-            <p className="mt-2 text-sm text-(--muted) leading-relaxed">{it.body}</p>
-          </div>
+
+            <div className="flex items-start justify-between">
+              <span className="icon-tile">
+                <HugeiconsIcon icon={icon} size={24} strokeWidth={1.6} />
+              </span>
+              <span className="text-[10px] font-mono tracking-[0.2em] text-(--muted)/50 group-hover:text-(--accent) transition-colors">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+            <h3 className="mt-6 font-semibold tracking-tight text-[15px]">
+              {title}
+            </h3>
+            <p className="mt-2 text-sm text-(--muted) leading-relaxed">{body}</p>
+          </article>
         ))}
       </div>
     </section>
@@ -158,97 +165,54 @@ function Install() {
   return (
     <section
       id="install"
-      className="mx-auto max-w-6xl px-6 lg:px-8 py-20 border-t border-(--border)"
+      className="mx-auto max-w-6xl px-6 lg:px-8 pt-32 pb-32 scroll-mt-20"
     >
-      <h2 className="text-3xl font-semibold tracking-tight">Install in 30 seconds.</h2>
-      <p className="mt-3 text-(--muted) max-w-xl">
-        macOS 14 (Sonoma) or newer. Apple Silicon and Intel both supported.
-      </p>
-      <div className="mt-10 grid lg:grid-cols-2 gap-4">
-        <div className="glass-card rounded-2xl p-7">
-          <div className="text-xs uppercase tracking-wider text-(--muted)">
-            Recommended
-          </div>
-          <div className="mt-2 font-semibold text-lg tracking-tight">Homebrew</div>
-          <p className="mt-2 text-sm text-(--muted)">
-            Auto-updates with the rest of your stack.
-          </p>
-          <pre className="mt-5 rounded-xl bg-black text-white text-[13px] font-mono p-4 overflow-x-auto">
-            <code>{BREW_TAP}</code>
-          </pre>
-        </div>
-        <div className="glass-card rounded-2xl p-7">
-          <div className="text-xs uppercase tracking-wider text-(--muted)">
-            Direct
-          </div>
-          <div className="mt-2 font-semibold text-lg tracking-tight">.dmg download</div>
-          <p className="mt-2 text-sm text-(--muted)">
-            Drag NepaliCalendar.app into your Applications folder.
-          </p>
-          <a
-            href={`${REPO_URL}/releases/latest`}
-            className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-(--foreground) text-(--background) font-medium hover:opacity-90 transition text-sm"
-          >
-            Download .dmg
-          </a>
+      <div className="text-center max-w-2xl mx-auto">
+        <span className="eyebrow justify-center">Get it</span>
+        <h2 className="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight">
+          Install in 30 seconds.
+        </h2>
+        <p className="mt-4 text-(--muted) leading-relaxed">
+          macOS 14 (Sonoma) or newer. Apple Silicon and Intel both supported.
+        </p>
+        <div className="mt-5 inline-flex items-center gap-2 text-[11px] text-(--muted)">
+          <Apple className="w-3 h-3" aria-hidden />
+          macOS 14+ · Universal binary
         </div>
       </div>
-      <div className="mt-10 glass-card rounded-2xl p-7">
-        <div className="font-semibold tracking-tight">Or build it yourself</div>
-        <p className="mt-2 text-sm text-(--muted)">
-          The whole app is &lt; 500 lines of Swift. Clone and run.
-        </p>
-        <pre className="mt-4 rounded-xl bg-black text-white text-[13px] font-mono p-4 overflow-x-auto">
-          <code>{`git clone ${REPO_URL}
-cd nepali-calendar/app
-./build.sh
-open build/NepaliCalendar.app`}</code>
-        </pre>
+
+      <div className="mt-12 max-w-2xl mx-auto">
+        <div className="glass-card rounded-2xl p-7 sm:p-8">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-(--accent) font-medium">
+              <HugeiconsIcon icon={StarIcon} size={11} />
+              Recommended
+            </span>
+            <span className="text-[10px] font-mono text-(--muted)">~10s</span>
+          </div>
+          <div className="mt-3 font-semibold text-lg tracking-tight">Homebrew</div>
+          <p className="mt-1.5 text-sm text-(--muted)">
+            Auto-updates with the rest of your stack.
+          </p>
+          <div className="mt-5">
+            <CodeBlock code={BREW_TAP} label="brew install command" />
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function Footer() {
+function Trust({ children }: { children: React.ReactNode }) {
   return (
-    <footer className="border-t border-(--border) mt-10">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-sm text-(--muted)">
-        <div>
-          Built by{" "}
-          <a
-            href="https://github.com/nabinkhair42"
-            className="underline underline-offset-4 decoration-(--border) hover:decoration-(--accent)"
-          >
-            Nabin Khair
-          </a>
-          . MIT-licensed.
-        </div>
-        <div className="sm:ml-auto flex items-center gap-5">
-          <a href={REPO_URL} className="hover:text-(--foreground) transition">
-            GitHub
-          </a>
-          <a
-            href={`${REPO_URL}/issues`}
-            className="hover:text-(--foreground) transition"
-          >
-            Report an issue
-          </a>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function GitHubIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M12 .5C5.6.5.5 5.6.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2.2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.4-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.3.8 1 .8 2v3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.6 18.4.5 12 .5z" />
-    </svg>
+    <span className="inline-flex items-center gap-1.5">
+      <HugeiconsIcon
+        icon={Tick02Icon}
+        size={12}
+        className="text-(--accent)"
+        strokeWidth={3}
+      />
+      {children}
+    </span>
   );
 }

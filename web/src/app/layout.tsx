@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Nepali Calendar — macOS Menu Bar App",
   description:
-    "Bikram Sambat in your menu bar. A clean, native macOS calendar that lives one click away. Free and open source.",
+    "Bikram Sambat in your menu bar. A clean, native macOS calendar that lives one click away. Free forever.",
   metadataBase: new URL("https://nepali-calendar.app"),
   openGraph: {
     title: "Nepali Calendar — macOS Menu Bar App",
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

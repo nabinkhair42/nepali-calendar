@@ -7,6 +7,7 @@ import BSCore
 final class AppState: ObservableObject {
     @Published var today: BSDate
     @Published var viewing: BSDate           // first-of-month being shown
+    @Published var selected: BSDate          // currently selected day in viewing month
     @Published var localeMode: Locale_
 
     private var tickTimer: Timer?
@@ -16,18 +17,39 @@ final class AppState: ObservableObject {
         let bs = (try? BSConverter.toBS(now)) ?? BSDate(year: 2082, month: 1, day: 1)
         self.today = bs
         self.viewing = BSDate(year: bs.year, month: bs.month, day: 1)
-        // Persist locale choice.
-        if let raw = UserDefaults.standard.string(forKey: "localeMode"), raw == "nepali" {
-            self.localeMode = .nepali
-        } else {
+        self.selected = bs
+        // Locale defaults to Nepali; persisted choice overrides on subsequent launches.
+        if let raw = UserDefaults.standard.string(forKey: "localeMode"), raw == "english" {
             self.localeMode = .english
+        } else {
+            self.localeMode = .nepali
         }
         scheduleMidnightTick()
     }
 
-    func goPrev() { viewing = viewing.adding(months: -1) }
-    func goNext() { viewing = viewing.adding(months: 1) }
-    func goToday() { viewing = BSDate(year: today.year, month: today.month, day: 1) }
+    /// Move to the previous month and snap selection to its first day.
+    func goPrev() {
+        viewing = viewing.adding(months: -1)
+        selected = BSDate(year: viewing.year, month: viewing.month, day: 1)
+    }
+
+    /// Move to the next month and snap selection to its first day.
+    func goNext() {
+        viewing = viewing.adding(months: 1)
+        selected = BSDate(year: viewing.year, month: viewing.month, day: 1)
+    }
+
+    /// Jump to today: viewing = today's month, selected = today.
+    func goToday() {
+        viewing = BSDate(year: today.year, month: today.month, day: 1)
+        selected = today
+    }
+
+    /// Select a specific day. The grid only emits dates inside the viewing
+    /// month, so this won't push selection out of view.
+    func select(_ date: BSDate) {
+        selected = date
+    }
 
     func toggleLocale() {
         localeMode = (localeMode == .english) ? .nepali : .english

@@ -8,11 +8,11 @@ struct NepaliCalendarApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            PopoverRootView()
+            PopoverRoot()
                 .environmentObject(state)
-                .frame(width: 320)
+                .frame(width: 360)
         } label: {
-            MenuBarLabelView(today: state.today, locale: state.localeMode)
+            MenuBarLabel(today: state.today, locale: state.localeMode)
         }
         .menuBarExtraStyle(.window)
     }

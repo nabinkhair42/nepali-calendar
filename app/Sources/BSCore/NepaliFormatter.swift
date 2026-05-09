@@ -28,6 +28,9 @@ public enum NepaliFormatter {
     public static let weekdaysEN_full: [String] = [
         "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     ]
+    public static let weekdaysNE_full: [String] = [
+        "आइतबार", "सोमबार", "मंगलबार", "बुधबार", "बिहीबार", "शुक्रबार", "शनिबार"
+    ]
 
     private static let nepaliDigits: [Character] = ["०", "१", "२", "३", "४", "५", "६", "७", "८", "९"]
 
@@ -56,9 +59,9 @@ public enum NepaliFormatter {
         locale == .nepali ? toNepaliDigits(y) : String(y)
     }
 
-    /// Compact label for the menu bar: "Jes 26" / "जेठ २६".
+    /// Menu bar label: full month name + day, e.g. "Jestha 26" / "जेठ २६".
     public static func menuBarLabel(_ bs: BSDate, locale: Locale_) -> String {
-        let m = monthName(bs.month, locale: locale, short: locale == .english)
+        let m = monthName(bs.month, locale: locale, short: false)
         let d = dayString(bs.day, locale: locale)
         return "\(m) \(d)"
     }

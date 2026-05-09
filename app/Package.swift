@@ -12,7 +12,8 @@ let package = Package(
     targets: [
         .target(
             name: "BSCore",
-            path: "Sources/BSCore"
+            path: "Sources/BSCore",
+            resources: [.process("Resources")]
         ),
         .executableTarget(
             name: "NepaliCalendar",

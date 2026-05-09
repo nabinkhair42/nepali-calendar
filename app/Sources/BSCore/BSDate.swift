@@ -11,14 +11,6 @@ public struct BSDate: Equatable, Hashable, Codable, Sendable {
         self.day = day
     }
 
-    public func isValid() -> Bool {
-        guard let lengths = BSData.monthLengths(forYear: year) else { return false }
-        guard (1...12).contains(month) else { return false }
-        return (1...lengths[month - 1]).contains(day)
-    }
-
-    public func startOfMonth() -> BSDate { BSDate(year: year, month: month, day: 1) }
-
     public func daysInMonth() -> Int? {
         BSData.monthLengths(forYear: year).map { $0[month - 1] }
     }

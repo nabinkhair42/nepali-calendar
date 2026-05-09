@@ -2,7 +2,9 @@
 # Build NepaliCalendar.app from the Swift Package and bundle it as a status-bar app.
 set -euo pipefail
 
-CONFIG="${CONFIG:-release}"
+# Default to debug — works on Command Line Tools without an Xcode license.
+# Override with CONFIG=release once you have full Xcode installed.
+CONFIG="${CONFIG:-debug}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 APP_NAME="NepaliCalendar"
 APP_DIR="$ROOT/build/$APP_NAME.app"
@@ -27,6 +29,12 @@ cp "$ROOT/Info.plist" "$CONTENTS/Info.plist"
 if [ -d "$ROOT/Resources" ] && [ -n "$(ls -A "$ROOT/Resources" 2>/dev/null || true)" ]; then
     cp -R "$ROOT/Resources/." "$RES/"
 fi
+
+# SPM resource bundles (BSCore festival JSON, future fonts, etc.)
+SPM_BIN_DIR="$(swift build -c "$CONFIG" --show-bin-path)"
+for bundle in "$SPM_BIN_DIR"/*.bundle; do
+    [ -d "$bundle" ] && cp -R "$bundle" "$RES/"
+done
 
 # Ad-hoc sign so macOS will run the bundle locally.
 echo "==> ad-hoc signing"

@@ -1,7 +1,10 @@
 import SwiftUI
 import BSCore
 
-struct MenuBarLabelView: View {
+/// Compact label that sits in the menu bar. Just the BS month and day —
+/// e.g. `बैशाख २६` or `Baisakh 26`. Time and AD secondary info live in
+/// the popover, never the bar.
+struct MenuBarLabel: View {
     let today: BSDate
     let locale: Locale_
 
