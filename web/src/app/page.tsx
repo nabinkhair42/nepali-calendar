@@ -222,8 +222,8 @@ function Footer() {
   return (
     <footer className="px-6 py-10 border-t border-border text-xs text-muted-foreground">
       <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-3">
-        <span>Made by Nabin Khair. MIT licensed.</span>
-        <span>© {new Date().getFullYear()}</span>
+        <span>Made by Nabin Khair.</span>
+        <span>© {new Date().getFullYear()} · All rights reserved</span>
       </div>
     </footer>
   );
