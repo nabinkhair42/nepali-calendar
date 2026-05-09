@@ -12,6 +12,8 @@ struct SelectedDayPanel: View {
     let today: BSDate
     let locale: Locale_
 
+    @EnvironmentObject private var festivalDB: FestivalDatabase
+
     private var weekdayName: String {
         let idx = BSConverter.weekday(date) - 1
         return locale == .nepali
@@ -34,7 +36,7 @@ struct SelectedDayPanel: View {
         return f.string(from: ad)
     }
 
-    private var festivals: [Festival] { FestivalDatabase.festivals(on: date) }
+    private var festivals: [Festival] { festivalDB.festivals(on: date) }
     private var isToday: Bool { date == today }
 
     var body: some View {

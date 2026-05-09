@@ -15,6 +15,8 @@ struct MonthGrid: View {
     let locale: Locale_
     let onSelect: (BSDate) -> Void
 
+    @EnvironmentObject private var festivalDB: FestivalDatabase
+
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private static let weekendIndices: Set<Int> = [0, 6]
 
@@ -50,7 +52,7 @@ struct MonthGrid: View {
     }
 
     private func viewState(for day: BSDate, columnIndex: Int) -> DayCell.ViewState {
-        let festivals = FestivalDatabase.festivals(on: day)
+        let festivals = festivalDB.festivals(on: day)
         let isHoliday = festivals.contains { $0.isHoliday }
         let observanceColors = festivals
             .filter { !$0.isHoliday }
