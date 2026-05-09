@@ -3,25 +3,18 @@ import { ShellWrapper } from "@/components/layouts/shell-wrapper";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { CopyCommand } from "@/components/copy-command";
-import { PageShortcuts } from "@/components/page-shortcuts";
 import { Apple } from "@/components/apple-icons";
+import { Swift } from "@/components/swift-icon";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Calendar03Icon,
-  EyeIcon,
-  ShieldKeyIcon,
-} from "@hugeicons/core-free-icons";
+import { Calendar03Icon, EyeIcon } from "@hugeicons/core-free-icons";
 
 export default function Page() {
   return (
-    <>
-      <PageShortcuts />
-      <div className="flex flex-col gap-12 py-8">
-        <Hero />
-        <Features />
-        <Install />
-      </div>
-    </>
+    <div className="flex flex-col gap-12 py-8">
+      <Hero />
+      <Features />
+      <Install />
+    </div>
   );
 }
 
@@ -40,7 +33,7 @@ function Hero() {
             fill
             sizes="(min-width: 768px) 128px, 112px"
             priority
-            className="rounded-lg border object-cover shadow-md"
+            className="object-cover"
           />
         </div>
 
@@ -86,19 +79,23 @@ function Hero() {
 /* -------------------------------------------------------------------------- */
 
 function Features() {
-  const items = [
+  const items: Array<{
+    icon: React.ReactNode;
+    title: string;
+    tagline: string;
+  }> = [
     {
-      icon: EyeIcon,
+      icon: <HugeiconsIcon icon={EyeIcon} size={18} strokeWidth={1.6} />,
       title: "One click away",
       tagline: "Lives in your menu bar. Click anywhere else to dismiss.",
     },
     {
-      icon: Calendar03Icon,
+      icon: <HugeiconsIcon icon={Calendar03Icon} size={18} strokeWidth={1.6} />,
       title: "Festivals you celebrate",
       tagline: "Public holidays and observances, color-coded by category.",
     },
     {
-      icon: ShieldKeyIcon,
+      icon: <Swift className="size-5" />,
       title: "Native, private, free",
       tagline: "Built in Swift. No accounts, no telemetry.",
     },
@@ -128,8 +125,8 @@ function Features() {
                 (idx < items.length - 1 ? " border-b border-border" : "")
               }
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-md border bg-muted text-foreground">
-                <HugeiconsIcon icon={item.icon} size={18} strokeWidth={1.6} />
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-md border bg-card text-foreground">
+                {item.icon}
               </span>
               <div className="space-y-0.5 pt-0.5">
                 <h3 className="text-lg font-medium md:text-xl">{item.title}</h3>

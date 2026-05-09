@@ -4,6 +4,8 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layouts/site-header";
 import { SiteFooter } from "@/components/layouts/site-footer";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { PageShortcuts } from "@/components/page-shortcuts";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -51,17 +53,20 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative grid min-h-screen w-full grid-cols-[1fr_min(50rem,calc(100%-3rem))_1fr]">
-            <div className="col-start-2 flex min-h-screen w-full flex-col">
-              <SiteHeader />
-              <main id="main-content" className="flex flex-1 flex-col">
-                {children}
-              </main>
-              <SiteFooter />
+          <TooltipProvider delayDuration={150}>
+            <PageShortcuts />
+            <div className="relative grid min-h-screen w-full grid-cols-[1fr_min(50rem,calc(100%-3rem))_1fr]">
+              <div className="col-start-2 flex min-h-screen w-full flex-col">
+                <SiteHeader />
+                <main id="main-content" className="flex flex-1 flex-col">
+                  {children}
+                </main>
+                <SiteFooter />
+              </div>
+              <div className="col-start-1 row-span-full border-r border-dashed border-r-(--pattern-fg) pattern-hatch" />
+              <div className="col-start-3 row-span-full border-l border-dashed border-l-(--pattern-fg) pattern-hatch" />
             </div>
-            <div className="col-start-1 row-span-full border-r border-dashed border-r-(--pattern-fg) pattern-hatch" />
-            <div className="col-start-3 row-span-full border-l border-dashed border-l-(--pattern-fg) pattern-hatch" />
-          </div>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
