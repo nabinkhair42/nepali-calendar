@@ -18,12 +18,28 @@ public enum BSConverter {
         return cal.date(from: c)!
     }()
 
-    /// Convert AD date → BS date.
-    public static func toBS(_ adDate: Date) throws -> BSDate {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = utc
-        let startOfDay = cal.startOfDay(for: adDate)
-        let days = cal.dateComponents([.day], from: epochAD, to: startOfDay).day ?? 0
+    /// Convert AD date → BS date. Pass `timeZone: .current` so that "today"
+    /// resolves to the user's *local* calendar day; otherwise a date sampled
+    /// at local midnight (like the menu-bar refresh) collapses to the
+    /// previous UTC day and returns yesterday's BS.
+    public static func toBS(_ adDate: Date, in timeZone: TimeZone = TimeZone(identifier: "UTC")!) throws -> BSDate {
+        // Read the calendar day in the requested zone…
+        var localCal = Calendar(identifier: .gregorian)
+        localCal.timeZone = timeZone
+        let comps = localCal.dateComponents([.year, .month, .day], from: adDate)
+
+        // …then anchor that day to UTC midnight so the day-count arithmetic
+        // against epochAD (also UTC midnight) stays integer-clean.
+        var utcCal = Calendar(identifier: .gregorian)
+        utcCal.timeZone = utc
+        var c = DateComponents()
+        c.year = comps.year
+        c.month = comps.month
+        c.day = comps.day
+        c.timeZone = utc
+        guard let asUTC = utcCal.date(from: c) else { throw BSConverterError.outOfRange }
+
+        let days = utcCal.dateComponents([.day], from: epochAD, to: asUTC).day ?? 0
         guard days >= 0 else { throw BSConverterError.outOfRange }
 
         var remaining = days

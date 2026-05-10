@@ -47,12 +47,12 @@ echo
 echo "$(cyan 'Nepali Calendar') $(gray 'installer')"
 echo
 
-say "Downloading…"
+say "Downloading..."
 curl -fSL --progress-bar "$DMG_URL" -o "$TMP_DMG" \
     || fail "Download failed. Check your connection or grab the .dmg manually:
    $DMG_URL"
 
-say "Mounting disk image…"
+say "Mounting disk image..."
 MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -readonly -mountrandom /tmp 2>/dev/null \
     | awk '/\/tmp\// { for (i=3; i<=NF; i++) printf "%s ", $i; print "" }' \
     | sed 's/ *$//' \
@@ -64,14 +64,14 @@ MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -readonly -mountrandom /tmp 2>
 # If it's already running, quit it before overwriting — otherwise the
 # Mach-O is in use and `cp -R` may produce a broken bundle.
 if pgrep -f "$APP_NAME/Contents/MacOS/" >/dev/null 2>&1; then
-    say "Quitting running instance…"
+    say "Quitting running instance..."
     osascript -e "tell application \"$APP_DISPLAY\" to quit" 2>/dev/null || true
     sleep 1
 fi
 
-say "Installing to $APPLICATIONS_DIR…"
+say "Installing to $APPLICATIONS_DIR..."
 if [ ! -w "$APPLICATIONS_DIR" ]; then
-    fail "Cannot write to $APPLICATIONS_DIR. Re-run with: sudo bash …"
+    fail "Cannot write to $APPLICATIONS_DIR. Re-run with: sudo bash ..."
 fi
 rm -rf "$APPLICATIONS_DIR/$APP_NAME"
 cp -R "$MOUNT_POINT/$APP_NAME" "$APPLICATIONS_DIR/"

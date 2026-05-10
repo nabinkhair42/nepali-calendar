@@ -14,7 +14,7 @@ final class AppState: ObservableObject {
 
     init() {
         let now = Date()
-        let bs = (try? BSConverter.toBS(now)) ?? BSDate(year: 2082, month: 1, day: 1)
+        let bs = (try? BSConverter.toBS(now, in: .current)) ?? BSDate(year: 2082, month: 1, day: 1)
         self.today = bs
         self.viewing = BSDate(year: bs.year, month: bs.month, day: 1)
         self.selected = bs
@@ -66,7 +66,7 @@ final class AppState: ObservableObject {
         tickTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self else { return }
-                if let bs = try? BSConverter.toBS(Date()) {
+                if let bs = try? BSConverter.toBS(Date(), in: .current) {
                     self.today = bs
                 }
                 self.scheduleMidnightTick()
