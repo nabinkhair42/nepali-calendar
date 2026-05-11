@@ -14,6 +14,7 @@ final class AppState: ObservableObject {
     private var midnightTimer: Timer?
     private var heartbeatTimer: Timer?
     private var wakeObserver: NSObjectProtocol?
+    private var sleepObserver: NSObjectProtocol?
 
     init() {
         let now = Date()
@@ -29,15 +30,15 @@ final class AppState: ObservableObject {
         }
         scheduleMidnightTick()
         scheduleHeartbeat()
-        observeSystemWake()
+        observeSystemPower()
     }
 
     deinit {
         midnightTimer?.invalidate()
         heartbeatTimer?.invalidate()
-        if let wakeObserver {
-            NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver)
-        }
+        let nc = NSWorkspace.shared.notificationCenter
+        if let wakeObserver { nc.removeObserver(wakeObserver) }
+        if let sleepObserver { nc.removeObserver(sleepObserver) }
     }
 
     /// Move to the previous month and snap selection to its first day.
@@ -112,11 +113,23 @@ final class AppState: ObservableObject {
         heartbeatTimer = timer
     }
 
-    /// `NSWorkspace.didWakeNotification` fires on the main thread when the
-    /// Mac resumes from sleep — the most reliable signal that we might have
-    /// crossed midnight while suspended.
-    private func observeSystemWake() {
-        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+    /// Sleep/wake observers. Apple DTS pattern for time-sensitive timers:
+    /// invalidate before sleep so the timer can't fire with a stale schedule
+    /// on wake, then recompute + reschedule on wake. Timer-based deadlines
+    /// rely on Mach absolute time, which pauses during system sleep.
+    private func observeSystemPower() {
+        let nc = NSWorkspace.shared.notificationCenter
+        sleepObserver = nc.addObserver(
+            forName: NSWorkspace.willSleepNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.midnightTimer?.invalidate()
+                self?.midnightTimer = nil
+            }
+        }
+        wakeObserver = nc.addObserver(
             forName: NSWorkspace.didWakeNotification,
             object: nil,
             queue: .main
@@ -124,7 +137,6 @@ final class AppState: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 self.refreshToday()
-                // Re-arm the midnight timer relative to the post-wake clock.
                 self.scheduleMidnightTick()
             }
         }
