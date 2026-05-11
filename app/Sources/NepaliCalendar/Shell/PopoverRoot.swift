@@ -36,6 +36,9 @@ struct PopoverRoot: View {
         .preferredColorScheme(nil)
         .background(KeyboardShortcuts(route: $route))
         .animation(.easeInOut(duration: 0.18), value: route)
+        // Catch any midnight flip the timer missed (e.g. Mac was asleep) the
+        // moment the user opens the menu — see issue #1.
+        .onAppear { state.refreshToday() }
     }
 
     private var calendarBody: some View {

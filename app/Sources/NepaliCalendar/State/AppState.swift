@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import AppKit
 import BSCore
 
 @MainActor
@@ -10,7 +11,9 @@ final class AppState: ObservableObject {
     @Published var selected: BSDate          // currently selected day in viewing month
     @Published var localeMode: Locale_
 
-    private var tickTimer: Timer?
+    private var midnightTimer: Timer?
+    private var heartbeatTimer: Timer?
+    private var wakeObserver: NSObjectProtocol?
 
     init() {
         let now = Date()
@@ -25,6 +28,16 @@ final class AppState: ObservableObject {
             self.localeMode = .nepali
         }
         scheduleMidnightTick()
+        scheduleHeartbeat()
+        observeSystemWake()
+    }
+
+    deinit {
+        midnightTimer?.invalidate()
+        heartbeatTimer?.invalidate()
+        if let wakeObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver)
+        }
     }
 
     /// Move to the previous month and snap selection to its first day.
@@ -56,19 +69,62 @@ final class AppState: ObservableObject {
         UserDefaults.standard.set(localeMode == .nepali ? "nepali" : "english", forKey: "localeMode")
     }
 
+    /// Recompute `today` from wall-clock now. Cheap (no I/O), idempotent —
+    /// safe to call from any of the refresh paths (midnight, wake, popover,
+    /// heartbeat). Only assigns when the day actually flipped so `@Published`
+    /// doesn't churn views every minute.
+    func refreshToday() {
+        guard let bs = try? BSConverter.toBS(Date(), in: .current) else { return }
+        if bs != today {
+            today = bs
+        }
+    }
+
     /// Refresh `today` at the next local midnight so the highlighted cell stays current.
+    /// On its own this is fragile — `Timer` doesn't fire while the Mac is asleep, so we
+    /// also wire wake + heartbeat + popover-open as backstops (see issue #1).
     private func scheduleMidnightTick() {
         let cal = Calendar.current
         let now = Date()
         guard let nextMidnight = cal.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 5), matchingPolicy: .nextTime) else { return }
         let interval = nextMidnight.timeIntervalSince(now)
-        tickTimer?.invalidate()
-        tickTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+        midnightTimer?.invalidate()
+        midnightTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self else { return }
-                if let bs = try? BSConverter.toBS(Date(), in: .current) {
-                    self.today = bs
-                }
+                self.refreshToday()
+                self.scheduleMidnightTick()
+            }
+        }
+    }
+
+    /// 60-second backstop. After a sleep, `Timer` will start firing again on
+    /// wake; the first tick catches any missed midnight transition. Cheap
+    /// enough to run forever — a single date-components diff + array walk.
+    private func scheduleHeartbeat() {
+        heartbeatTimer?.invalidate()
+        let timer = Timer(timeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.refreshToday()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        heartbeatTimer = timer
+    }
+
+    /// `NSWorkspace.didWakeNotification` fires on the main thread when the
+    /// Mac resumes from sleep — the most reliable signal that we might have
+    /// crossed midnight while suspended.
+    private func observeSystemWake() {
+        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.refreshToday()
+                // Re-arm the midnight timer relative to the post-wake clock.
                 self.scheduleMidnightTick()
             }
         }
