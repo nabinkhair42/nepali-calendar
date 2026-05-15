@@ -6,6 +6,8 @@ import BSCore
 struct NepaliCalendarApp: App {
     @StateObject private var state = AppState()
     @StateObject private var festivalDB = FestivalDatabase.shared
+    @StateObject private var updateChecker = UpdateChecker()
+    @StateObject private var installation = InstallationManager()
 
     init() {
         // Synchronously load this year ± 1 from cache+bundle so the first
@@ -27,7 +29,12 @@ struct NepaliCalendarApp: App {
         // changes. Declaring MenuBarExtra directly here against a Scene-level
         // @StateObject hits a SwiftUI bug where the label closure is not
         // invalidated on @Published mutations — see MenuBarLabel.
-        MenuBarScene(state: state, festivalDB: festivalDB)
+        MenuBarScene(
+            state: state,
+            festivalDB: festivalDB,
+            updateChecker: updateChecker,
+            installation: installation
+        )
     }
 
     /// Years we keep loaded — current ± 1 so navigating into prev/next month
@@ -41,13 +48,21 @@ struct NepaliCalendarApp: App {
 private struct MenuBarScene: Scene {
     @ObservedObject var state: AppState
     @ObservedObject var festivalDB: FestivalDatabase
+    @ObservedObject var updateChecker: UpdateChecker
+    @ObservedObject var installation: InstallationManager
 
     var body: some Scene {
         MenuBarExtra {
             PopoverRoot()
                 .environmentObject(state)
                 .environmentObject(festivalDB)
+                .environmentObject(updateChecker)
+                .environmentObject(installation)
                 .frame(width: 360)
+                .onAppear {
+                    updateChecker.start()
+                    installation.scan()
+                }
         } label: {
             MenuBarLabel(state: state)
         }

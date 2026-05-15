@@ -1,9 +1,11 @@
 import SwiftUI
 import BSCore
 
-/// Month title + AD subtitle on the left; chevron pill (prev / today / next)
-/// on the right. Three nav buttons live in a single rounded container with
-/// hairline dividers between them, matching reference patro UIs.
+/// Month title + AD subtitle on the left; flat chevron buttons (prev /
+/// today / next) on the right. The buttons are intentionally borderless
+/// at rest — the segmented-pill look was reading as a permanently
+/// "pressed" control. Grouping comes from proximity, hover gives a
+/// per-button rounded highlight.
 struct MonthHeader: View {
     let viewing: BSDate
     let locale: Locale_
@@ -37,35 +39,17 @@ private struct NavPill: View {
     let onNext: () -> Void
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 2) {
             NavButton(system: "chevron.left", action: onPrev)
                 .keyboardShortcut(.leftArrow, modifiers: .command)
                 .help("Previous month (⌘←)")
-            HairLine()
             NavButton(system: "scope", action: onToday)
                 .keyboardShortcut("t", modifiers: .command)
                 .help("Today (⌘T)")
-            HairLine()
             NavButton(system: "chevron.right", action: onNext)
                 .keyboardShortcut(.rightArrow, modifiers: .command)
                 .help("Next month (⌘→)")
         }
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color.primary.opacity(0.06))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.06), lineWidth: 1)
-        )
-    }
-}
-
-private struct HairLine: View {
-    var body: some View {
-        Rectangle()
-            .fill(Color.primary.opacity(0.14))
-            .frame(width: 1, height: 14)
     }
 }
 
@@ -77,10 +61,15 @@ private struct NavButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: system)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
                 .frame(width: 28, height: 24)
-                .background(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                )
                 .contentShape(Rectangle())
+                .animation(.easeOut(duration: 0.12), value: hovered)
         }
         .buttonStyle(.plain)
         .onHover { hovered = $0 }

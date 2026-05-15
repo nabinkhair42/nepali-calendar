@@ -1,16 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
 const DMG_URL = "/downloads/NepaliCalendar.dmg";
-const INSTALL_CMD =
-  "curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash";
 
 /**
  * Global keyboard shortcuts:
  *   D — trigger the .dmg download
- *   I — copy the install command to the clipboard
+ *   C — go to the /changelog page
  *   T — toggle light / dark theme
  *
  * Skipped while the user is typing in an input/textarea or holding a
@@ -18,6 +17,7 @@ const INSTALL_CMD =
  */
 export function PageShortcuts() {
   const { setTheme, resolvedTheme } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     function isTypingTarget(el: EventTarget | null): boolean {
@@ -44,10 +44,9 @@ export function PageShortcuts() {
         document.body.appendChild(a);
         a.click();
         a.remove();
-      } else if (k === "i") {
+      } else if (k === "c") {
         e.preventDefault();
-        navigator.clipboard?.writeText(INSTALL_CMD).catch(() => {});
-        window.dispatchEvent(new CustomEvent("nepalicalendar:copy-install"));
+        router.push("/changelog");
       } else if (k === "t") {
         e.preventDefault();
         setTheme(resolvedTheme === "dark" ? "light" : "dark");
@@ -56,7 +55,7 @@ export function PageShortcuts() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [resolvedTheme, setTheme]);
+  }, [resolvedTheme, setTheme, router]);
 
   return null;
 }

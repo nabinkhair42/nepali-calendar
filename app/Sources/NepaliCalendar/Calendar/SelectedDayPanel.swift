@@ -55,12 +55,15 @@ struct SelectedDayPanel: View {
                 .padding(.top, -2)
 
             if !festivals.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
+                Divider()
+                    .opacity(0.18)
+                    .padding(.top, 8)
+                    .padding(.bottom, 2)
+                VStack(alignment: .leading, spacing: 7) {
                     ForEach(Array(festivals.enumerated()), id: \.offset) { _, festival in
                         FestivalRow(festival: festival, locale: locale)
                     }
                 }
-                .padding(.top, 6)
             }
         }
     }
@@ -75,39 +78,38 @@ private struct FestivalRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 9) {
             Circle()
                 .fill(tintColor)
-                .frame(width: 7, height: 7)
+                .frame(width: 6, height: 6)
             Text(festival.name(locale: locale))
-                .font(.label)
+                .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color.fgPrimary)
                 .lineLimit(1)
             Spacer(minLength: 4)
-            TagChip(
-                text: festival.isHoliday ? "Holiday" : "Observance",
-                tint: tintColor
-            )
+            // Only flag actual holidays — the "Observance" label that used to
+            // repeat for every cultural/international row was visual noise.
+            // The colored dot already carries the category signal.
+            if festival.isHoliday {
+                HolidayChip()
+            }
         }
     }
 }
 
-private struct TagChip: View {
-    let text: String
-    let tint: Color
+/// Holiday badge. Solid amber fill + white text — readable in both light
+/// and dark mode without depending on the popover surface luminance. The
+/// earlier amber-on-amber-tint version had no contrast against itself.
+private struct HolidayChip: View {
     var body: some View {
-        Text(text)
-            .font(.system(size: 10, weight: .medium))
-            .foregroundStyle(tint)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+        Text("Holiday")
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
             .background(
                 Capsule()
-                    .fill(tint.opacity(0.10))
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(tint.opacity(0.18), lineWidth: 0.5)
+                    .fill(Color.accentHoliday)
             )
     }
 }

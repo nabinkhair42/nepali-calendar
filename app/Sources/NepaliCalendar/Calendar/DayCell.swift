@@ -5,13 +5,15 @@ import BSCore
 /// pure presentational so the grid can drive it from any source (events,
 /// EventKit overlay, festivals layer, panchanga layer).
 ///
-/// Visual semantics (per v2 spec):
-///   - Today           → 1.5px red ring, no fill
-///   - Selected        → solid blue pill, white numerals
-///   - Today + Selected → ring composes over fill
+/// Visual semantics:
+///   - Today           → BS numeral in `accentToday` (red), semibold weight
+///   - Selected        → soft blue-tinted pill, primary numerals
+///   - Today + Selected → pill + red numeral (color signal survives the fill)
 ///   - Holiday         → amber dot, top-right
 ///   - Saait           → soft green dot, bottom-right
-///   - Weekend column  → muted weekend foreground (NOT alert red)
+///   - Weekend column  → muted weekend foreground (NOT alert red); today's
+///                       red overrides the weekend hue so weekends-that-are-
+///                       today still read as today first.
 ///   - Events          → row of small colored dots, bottom-center
 struct DayCell: View {
     struct ViewState: Equatable {
@@ -32,21 +34,18 @@ struct DayCell: View {
 
     var body: some View {
         ZStack {
-            // 1. Selected fill — sits beneath everything else.
+            // Selected fill — soft tint pill, sits beneath the numerals.
+            // Today no longer adds a ring on top; today's identity is now
+            // carried by the numeral color + weight so the cell stays clean
+            // whether or not it's also the selected day.
             if state.isSelected {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.accentSelected)
-            }
-            // 2. Today ring — composes over the selected fill so a
-            //    today-AND-selected cell shows both signals.
-            if state.isToday {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color.accentToday, lineWidth: 1.5)
+                    .fill(Color.accentSelectedFill)
             }
 
             VStack(spacing: 0) {
                 Text(NepaliFormatter.dayString(state.bsDay, locale: locale))
-                    .font(.cellNumeral)
+                    .font(numeralFont)
                     .monospacedDigit()
                     .foregroundStyle(numeralColor)
                     .padding(.top, 8)
@@ -102,14 +101,23 @@ struct DayCell: View {
     }
 
     private var numeralColor: Color {
-        if state.isSelected { return .white }
-        if state.isWeekend  { return .fgWeekend }
+        // Today owns the red — wins over weekend tint and the selected fill.
+        if state.isToday { return .accentToday }
+        if state.isWeekend { return .fgWeekend }
         return .fgPrimary
     }
 
+    private var numeralFont: Font {
+        // Bump today to semibold; everything else stays at the regular
+        // weight defined by `.cellNumeral`.
+        state.isToday
+            ? Font.system(size: 18, weight: .semibold, design: .rounded)
+            : .cellNumeral
+    }
+
     private var adColor: Color {
-        if state.isSelected { return Color.white.opacity(0.7) }
-        return Color.fgPrimary.opacity(0.4)
+        if state.isToday { return Color.accentToday.opacity(0.65) }
+        return Color.fgPrimary.opacity(state.isSelected ? 0.55 : 0.4)
     }
 
     private var accessibilityLabel: String {

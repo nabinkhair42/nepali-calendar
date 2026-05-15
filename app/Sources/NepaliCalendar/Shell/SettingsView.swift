@@ -7,6 +7,8 @@ import BSCore
 /// content in-place; the back button (or Esc, or ⌘,) returns to the calendar.
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
+    @EnvironmentObject var updateChecker: UpdateChecker
+    @EnvironmentObject var installation: InstallationManager
     @StateObject private var loginManager = LaunchAtLoginManager.shared
     let onClose: () -> Void
 
@@ -33,6 +35,9 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 18) {
                 languageSection
                 generalSection
+                if !installation.duplicates.isEmpty {
+                    duplicatesSection
+                }
                 shortcutsSection
                 aboutSection
             }
@@ -50,19 +55,9 @@ struct SettingsView: View {
 
     private var header: some View {
         HStack(spacing: 8) {
-            Button(action: onClose) {
-                Image(systemName: "arrow.left")
-                    .font(.system(size: 11, weight: .semibold))
-                    .frame(width: 24, height: 24)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.primary.opacity(0.07))
-                    )
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .keyboardShortcut(.escape, modifiers: [])
-            .help("Back to calendar · Esc")
+            BackButton(action: onClose)
+                .keyboardShortcut(.escape, modifiers: [])
+                .help("Back to calendar · Esc")
 
             Text("Settings")
                 .font(.system(size: 14, weight: .semibold))
@@ -92,6 +87,53 @@ struct SettingsView: View {
                 subtitle: "Start Nepali Calendar automatically when you sign in.",
                 isOn: loginManager.isEnabled,
                 onToggle: { loginManager.toggle() }
+            )
+            SwitchRow(
+                title: "Automatically check for updates",
+                subtitle: "Look for new releases on launch and every few hours.",
+                isOn: updateChecker.automaticChecksEnabled,
+                onToggle: { updateChecker.automaticChecksEnabled.toggle() }
+            )
+        }
+    }
+
+    /// Appears only when a second copy of the app exists on disk. The
+    /// auto-updater only knows how to replace the currently-running bundle,
+    /// so any other install paths (manual drag-installs, leftover dev
+    /// builds, etc.) survive forever and show up alongside the real app
+    /// in Spotlight/Launchpad. This section lets the user clean them out.
+    private var duplicatesSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SectionTitle("Installation")
+            VStack(alignment: .leading, spacing: 8) {
+                Text(installation.duplicates.count == 1
+                     ? "Found another copy of Nepali Calendar on this Mac."
+                     : "Found \(installation.duplicates.count) other copies of Nepali Calendar on this Mac.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(installation.duplicates, id: \.self) { url in
+                    DuplicateRow(url: url) {
+                        installation.removeDuplicate(at: url)
+                    }
+                }
+
+                if let error = installation.lastError {
+                    Text(error)
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.accentHoliday)
+                        .padding(.top, 2)
+                }
+            }
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.primary.opacity(0.04))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
             )
         }
     }
@@ -242,6 +284,75 @@ private struct LanguageSegmented: View {
     }
 }
 
+private struct DuplicateRow: View {
+    let url: URL
+    let onTrash: () -> Void
+    @State private var hovered = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "doc.on.doc")
+                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(.secondary)
+                .frame(width: 14)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(url.lastPathComponent)
+                    .font(.system(size: 11, weight: .medium))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                Text(url.deletingLastPathComponent().path)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            Spacer(minLength: 6)
+            Button(action: onTrash) {
+                Text("Move to Trash")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(hovered ? Color.accentHoliday : Color.fgSecondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(hovered ? Color.accentHoliday.opacity(0.10) : Color.primary.opacity(0.05))
+                    )
+                    .contentShape(Rectangle())
+                    .animation(.easeOut(duration: 0.12), value: hovered)
+            }
+            .buttonStyle(.plain)
+            .onHover { hovered = $0 }
+            .help("Move \(url.path) to Trash")
+        }
+    }
+}
+
+/// Back-to-calendar arrow used in the Settings header. Flat at rest, soft
+/// hover; matches the macOS toolbar-button idiom.
+private struct BackButton: View {
+    let action: () -> Void
+    @State private var hovered = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "arrow.left")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
+                .frame(width: 26, height: 24)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                )
+                .contentShape(Rectangle())
+                .animation(.easeOut(duration: 0.12), value: hovered)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Quit action shown bottom-right of Settings. Matches the rest of the
+/// app's toolbar-button idiom — flat at rest, neutral soft hover. The ⌘Q
+/// shortcut is documented in the Shortcuts list above and in the tooltip.
 private struct QuitButton: View {
     @State private var hovered = false
 
@@ -249,33 +360,20 @@ private struct QuitButton: View {
         Button {
             NSApp.terminate(nil)
         } label: {
-            HStack(spacing: 6) {
-                Text("Quit")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(hovered ? Color.accentHoliday : Color.primary)
-                HStack(spacing: 3) {
-                    KeyCap(text: "⌘")
-                    KeyCap(text: "Q")
-                }
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(hovered
-                          ? Color.accentHoliday.opacity(0.10)
-                          : Color.primary.opacity(0.06))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .strokeBorder(
-                        hovered ? Color.accentHoliday.opacity(0.30) : Color.primary.opacity(0.08),
-                        lineWidth: 0.5
-                    )
-            )
-            .contentShape(Rectangle())
+            Text("Quit")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                )
+                .contentShape(Rectangle())
+                .animation(.easeOut(duration: 0.12), value: hovered)
         }
         .buttonStyle(.plain)
         .onHover { hovered = $0 }
+        .help("Quit Nepali Calendar · ⌘Q")
     }
 }

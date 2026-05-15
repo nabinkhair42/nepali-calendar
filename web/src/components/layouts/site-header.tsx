@@ -1,11 +1,11 @@
 "use client";
 
-import { Download, Moon, Sun } from "lucide-react";
+import { Download, History, Moon, Sun } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Kbd } from "@/components/ui/kbd";
 import {
   Tooltip,
@@ -31,6 +31,12 @@ export function SiteHeader() {
   const { setTheme, resolvedTheme } = useTheme();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  // next-themes resolves `resolvedTheme` only on the client; rendering the
+  // icon based on it during SSR causes a hydration mismatch when the
+  // resolved value differs from the server default. Gate the icon swap on
+  // a post-mount flag so the first paint matches what the server sent.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > SCROLL_THRESHOLD);
@@ -84,6 +90,22 @@ export function SiteHeader() {
         >
           <Tooltip>
             <TooltipTrigger asChild>
+              <Link
+                href="/changelog"
+                aria-label="Changelog"
+                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
+              >
+                <History className="size-4" strokeWidth={1.6} />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent className="flex items-center gap-2">
+              Changelog
+              <Kbd>C</Kbd>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
               <a
                 href={DMG_URL}
                 download
@@ -109,10 +131,17 @@ export function SiteHeader() {
                 aria-label="Toggle theme"
                 className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
               >
-                {resolvedTheme === "dark" ? (
-                  <Moon className="size-4" strokeWidth={1.6} />
+                {mounted ? (
+                  resolvedTheme === "dark" ? (
+                    <Moon className="size-4" strokeWidth={1.6} />
+                  ) : (
+                    <Sun className="size-4" strokeWidth={1.6} />
+                  )
                 ) : (
-                  <Sun className="size-4" strokeWidth={1.6} />
+                  // Layout-preserving placeholder until next-themes resolves
+                  // on the client. Identical box size so the button doesn't
+                  // jump after mount.
+                  <span className="size-4" aria-hidden />
                 )}
               </button>
             </TooltipTrigger>
