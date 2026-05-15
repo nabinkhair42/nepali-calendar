@@ -1,0 +1,11 @@
+{
+  "name": "Nepali Calendar",
+  "version": "0.1.2",
+  "build": "3",
+  "artifact": "NepaliCalendar.dmg",
+  "downloadUrl": "https://calendar.nabinkhair.com.np/downloads/NepaliCalendar.dmg",
+  "githubReleaseUrl": "https://github.com/nabinkhair42/nepali-calendar/releases/tag/v0.1.2",
+  "sha256": "40d6e2a9e21b41ad249edb796207613bc511d96824319e9077c6d2eabde374a2",
+  "sizeBytes": 1458447,
+  "createdAt": "2026-05-15T05:37:14Z"
+}

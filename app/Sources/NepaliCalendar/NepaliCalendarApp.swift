@@ -22,21 +22,35 @@ struct NepaliCalendarApp: App {
     }
 
     var body: some Scene {
+        // Wrapped in a dedicated Scene struct with @ObservedObject so the
+        // MenuBarExtra label and content actually re-render when AppState
+        // changes. Declaring MenuBarExtra directly here against a Scene-level
+        // @StateObject hits a SwiftUI bug where the label closure is not
+        // invalidated on @Published mutations — see MenuBarLabel.
+        MenuBarScene(state: state, festivalDB: festivalDB)
+    }
+
+    /// Years we keep loaded — current ± 1 so navigating into prev/next month
+    /// at year boundaries shows the right festivals without re-fetching.
+    private static func relevantYears() -> [Int] {
+        let bs = (try? BSConverter.toBS(Date(), in: .autoupdatingCurrent)) ?? BSDate(year: 2083, month: 1, day: 1)
+        return [bs.year - 1, bs.year, bs.year + 1]
+    }
+}
+
+private struct MenuBarScene: Scene {
+    @ObservedObject var state: AppState
+    @ObservedObject var festivalDB: FestivalDatabase
+
+    var body: some Scene {
         MenuBarExtra {
             PopoverRoot()
                 .environmentObject(state)
                 .environmentObject(festivalDB)
                 .frame(width: 360)
         } label: {
-            MenuBarLabel(today: state.today, locale: state.localeMode)
+            MenuBarLabel(state: state)
         }
         .menuBarExtraStyle(.window)
-    }
-
-    /// Years we keep loaded — current ± 1 so navigating into prev/next month
-    /// at year boundaries shows the right festivals without re-fetching.
-    private static func relevantYears() -> [Int] {
-        let bs = (try? BSConverter.toBS(Date())) ?? BSDate(year: 2083, month: 1, day: 1)
-        return [bs.year - 1, bs.year, bs.year + 1]
     }
 }

@@ -18,10 +18,10 @@ public enum BSConverter {
         return cal.date(from: c)!
     }()
 
-    /// Convert AD date → BS date. Pass `timeZone: .current` so that "today"
-    /// resolves to the user's *local* calendar day; otherwise a date sampled
-    /// at local midnight (like the menu-bar refresh) collapses to the
-    /// previous UTC day and returns yesterday's BS.
+    /// Convert AD date → BS date. Pass `.current` or `.autoupdatingCurrent`
+    /// so that "today" resolves to the user's local calendar day; otherwise
+    /// a date sampled at local midnight (like the menu-bar refresh) collapses
+    /// to the previous UTC day and returns yesterday's BS.
     public static func toBS(_ adDate: Date, in timeZone: TimeZone = TimeZone(identifier: "UTC")!) throws -> BSDate {
         // Read the calendar day in the requested zone…
         var localCal = Calendar(identifier: .gregorian)
