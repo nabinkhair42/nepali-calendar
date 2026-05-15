@@ -114,10 +114,10 @@ export default function PrivacyPage() {
               <p>
                 Questions, requests, or concerns:{" "}
                 <a
-                  href="mailto:social@mersel.ai"
+                  href="mailto:nabinkhair12@gmail.com"
                   className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-primary"
                 >
-                  social@mersel.ai
+                  nabinkhair12@gmail.com
                 </a>
                 .
               </p>
