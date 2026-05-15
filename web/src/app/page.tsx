@@ -4,13 +4,15 @@ import { ExternalLink, ShieldCheck } from "lucide-react";
 import { Apple } from "@/components/apple-icons";
 import { ShellWrapper } from "@/components/layouts/shell-wrapper";
 import { Button } from "@/components/ui/button";
+import {
+  DISPLAY_NAME,
+  DOWNLOAD_URL,
+  GITHUB_RELEASES_URL,
+} from "@/lib/app-constants";
 import latestBuild from "../../public/downloads/latest.json";
 
 const APP_VERSION = latestBuild.version;
 const APP_BUILD = latestBuild.build;
-const DOWNLOAD_URL = "/downloads/NepaliCalendar.dmg";
-const GITHUB_RELEASE_URL =
-  "https://github.com/nabinkhair42/nepali-calendar/releases";
 
 export default function Page() {
   return (
@@ -29,7 +31,7 @@ function Hero() {
         <div className="relative size-28 shrink-0 md:size-32">
           <Image
             src="/icon.svg"
-            alt="Nepali Calendar app icon"
+            alt={`${DISPLAY_NAME} app icon`}
             fill
             sizes="(min-width: 768px) 128px, 112px"
             priority
@@ -40,7 +42,7 @@ function Hero() {
         <div className="space-y-5">
           <div className="space-y-2">
             <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
-              Nepali Calendar
+              {DISPLAY_NAME}
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
               Bikram Sambat in your macOS menu bar — festivals, public
@@ -92,7 +94,7 @@ function PreviewCard({
       >
         <Image
           src={src}
-          alt={`Nepali Calendar in ${label.toLowerCase()}`}
+          alt={`${DISPLAY_NAME} in ${label.toLowerCase()}`}
           fill
           sizes="(min-width: 640px) 25rem, 100vw"
           className="object-contain"
@@ -130,7 +132,7 @@ function Footer() {
             Changelog
           </Link>
           <a
-            href={GITHUB_RELEASE_URL}
+            href={GITHUB_RELEASES_URL}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 underline-offset-4 hover:text-foreground hover:underline"

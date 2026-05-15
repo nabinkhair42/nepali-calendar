@@ -48,12 +48,12 @@ final class UpdateChecker: ObservableObject {
 
     /// Primary endpoint: returns the manifest plus a server-computed
     /// `updateAvailable` flag against the caller's currentVersion/Build.
-    private static let feedURL = URL(string: "https://calendar.nabinkhair.com.np/api/app/update")!
+    private static let feedURL = AppConstants.updateAPIURL
 
     /// Fallback: the static manifest produced by `release.sh`. Used when the
     /// API endpoint isn't deployed yet, or returns a transient 5xx. Decodes
     /// into the same struct (server-only fields are optional).
-    private static let fallbackFeedURL = URL(string: "https://calendar.nabinkhair.com.np/downloads/latest.json")!
+    private static let fallbackFeedURL = AppConstants.manifestURL
 
     private var timer: Timer?
     private var inflight: Task<Void, Never>?

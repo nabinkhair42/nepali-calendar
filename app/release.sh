@@ -15,8 +15,14 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="NepaliCalendar"
-DISPLAY_NAME="Nepali Calendar"
+
+# Identity constants live in the repo-root release.config so build.sh,
+# release.sh, and the Swift/web mirror files can't drift apart.
+# shellcheck disable=SC1091
+. "$ROOT/../release.config"
+
+# Back-compat alias for the rest of this script.
+DISPLAY_NAME="$APP_DISPLAY"
 APP_DIR="$ROOT/build/$APP_NAME.app"
 
 DIST_DIR="$ROOT/dist"
@@ -67,9 +73,9 @@ cat > "$MANIFEST" <<JSON
   "name": "$DISPLAY_NAME",
   "version": "$VERSION",
   "build": "$BUILD",
-  "artifact": "$APP_NAME.dmg",
-  "downloadUrl": "https://calendar.nabinkhair.com.np/downloads/$APP_NAME.dmg",
-  "githubReleaseUrl": "https://github.com/nabinkhair42/nepali-calendar/releases/tag/v$VERSION",
+  "artifact": "$DMG_FILENAME",
+  "downloadUrl": "$DOWNLOAD_URL",
+  "githubReleaseUrl": "$GITHUB_RELEASES_URL/tag/v$VERSION",
   "sha256": "$SHA256",
   "sizeBytes": $SIZE_BYTES,
   "createdAt": "$CREATED_AT"
@@ -104,4 +110,4 @@ echo "  → $MANIFEST"
 echo "  → $PUBLIC_DIR/latest.json"
 echo ""
 echo "  Next: deploy the web/ project to publish at"
-echo "        https://calendar.nabinkhair.com.np/downloads/$APP_NAME.dmg"
+echo "        $DOWNLOAD_URL"

@@ -6,7 +6,12 @@ set -euo pipefail
 # Override with CONFIG=release once you have full Xcode installed.
 CONFIG="${CONFIG:-debug}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="NepaliCalendar"
+
+# Pull identity constants (APP_NAME etc.) from the repo-root release.config
+# so we don't drift from release.sh / install.sh.
+# shellcheck disable=SC1091
+. "$ROOT/../release.config"
+
 APP_DIR="$ROOT/build/$APP_NAME.app"
 CONTENTS="$APP_DIR/Contents"
 MACOS="$CONTENTS/MacOS"
