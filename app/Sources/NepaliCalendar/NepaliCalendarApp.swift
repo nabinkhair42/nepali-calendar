@@ -33,7 +33,7 @@ struct NepaliCalendarApp: App {
     /// Years we keep loaded — current ± 1 so navigating into prev/next month
     /// at year boundaries shows the right festivals without re-fetching.
     private static func relevantYears() -> [Int] {
-        let bs = (try? BSConverter.toBS(Date(), in: .current)) ?? BSDate(year: 2083, month: 1, day: 1)
+        let bs = (try? BSConverter.toBS(Date(), in: .autoupdatingCurrent)) ?? BSDate(year: 2083, month: 1, day: 1)
         return [bs.year - 1, bs.year, bs.year + 1]
     }
 }

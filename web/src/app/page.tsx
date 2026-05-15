@@ -1,33 +1,50 @@
 import Image from "next/image";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import {
+  CheckCircle2,
+  Download,
+  ExternalLink,
+  RefreshCcw,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+} from "lucide-react";
+import { Apple } from "@/components/apple-icons";
+import { CopyCommand } from "@/components/copy-command";
 import { ShellWrapper } from "@/components/layouts/shell-wrapper";
+import { Swift } from "@/components/swift-icon";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
-import { CopyCommand } from "@/components/copy-command";
-import { Apple } from "@/components/apple-icons";
-import { Swift } from "@/components/swift-icon";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar03Icon, EyeIcon } from "@hugeicons/core-free-icons";
+import latestBuild from "../../public/downloads/latest.json";
+
+const APP_VERSION = latestBuild.version;
+const APP_BUILD = latestBuild.build;
+const DMG_SHA256 = latestBuild.sha256;
+const DOWNLOAD_URL = "/downloads/NepaliCalendar.dmg";
+const MANIFEST_URL = "/downloads/latest.json";
+const GITHUB_RELEASE_URL =
+  "https://github.com/nabinkhair42/nepali-calendar/releases";
+const INSTALL_COMMAND =
+  "curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash";
 
 export default function Page() {
   return (
-    <div className="flex flex-col gap-12 py-8">
+    <div className="flex flex-col gap-10 py-8">
       <Hero />
-      <Features />
+      <ReleaseNotes />
       <Previews />
       <Install />
+      <Trust />
     </div>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Hero                                                                      */
-/* -------------------------------------------------------------------------- */
-
 function Hero() {
   return (
     <ShellWrapper>
-      <div className="flex flex-col gap-3 p-2 md:flex-row">
-        <div className="relative size-28 shrink-0 self-start md:mt-2.5 md:size-32">
+      <section className="grid gap-6 p-2 md:grid-cols-[8rem_1fr] md:items-start">
+        <div className="relative size-28 shrink-0 md:size-32">
           <Image
             src="/icon.svg"
             alt="Nepali Calendar app icon"
@@ -38,100 +55,113 @@ function Hero() {
           />
         </div>
 
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <p className="inline-flex items-center gap-2 rounded-md border px-2 py-1 text-xs font-medium text-muted-foreground">
+              <CheckCircle2 className="size-3.5 text-primary" />
+              v{APP_VERSION} build {APP_BUILD}
+            </p>
+            <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
               Nepali Calendar
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Menu bar app for macOS
+            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              Bikram Sambat in your macOS menu bar, with festivals, public
+              holidays, Nepali/English labels, and a popover that stays useful
+              after midnight and system sleep.
             </p>
           </div>
 
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Bikram Sambat in your menu bar. Festivals, public holidays, and
-            observances at a glance — native, fast, and quietly out of the
-            way until you need it.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button asChild>
-              <a href="/downloads/NepaliCalendar.dmg" download>
+              <a href={DOWNLOAD_URL} download>
                 <Apple className="size-4" />
-                Download
+                Download for macOS
                 <Kbd>D</Kbd>
               </a>
             </Button>
             <Button asChild size="sm" variant="outline">
               <a href="#install">
-                Install via terminal
+                <Terminal className="size-4" />
+                Terminal install
                 <Kbd>I</Kbd>
               </a>
             </Button>
           </div>
+
+          <dl className="grid gap-3 border-t pt-4 text-sm sm:grid-cols-3">
+            <Stat label="Platform" value="macOS 14+" />
+            <Stat label="Privacy" value="No accounts or telemetry" />
+            <Stat label="Distribution" value="Website + GitHub" />
+          </dl>
         </div>
-      </div>
+      </section>
     </ShellWrapper>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Features                                                                  */
-/* -------------------------------------------------------------------------- */
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-0.5">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="font-medium">{value}</dd>
+    </div>
+  );
+}
 
-function Features() {
+function ReleaseNotes() {
   const items: Array<{
-    icon: React.ReactNode;
+    icon: ReactNode;
     title: string;
-    tagline: string;
+    copy: string;
   }> = [
     {
-      icon: <HugeiconsIcon icon={EyeIcon} size={18} strokeWidth={1.6} />,
-      title: "One click away",
-      tagline: "Lives in your menu bar. Click anywhere else to dismiss.",
+      icon: <RefreshCcw className="size-4" />,
+      title: "Self-healing date state",
+      copy:
+        "When the BS day changes, the menu label, selected day, and visible month now move together.",
     },
     {
-      icon: <HugeiconsIcon icon={Calendar03Icon} size={18} strokeWidth={1.6} />,
-      title: "Festivals you celebrate",
-      tagline: "Public holidays and observances, color-coded by category.",
+      icon: <Sparkles className="size-4" />,
+      title: "Sleep and wake recovery",
+      copy:
+        "The app refreshes after wake, on popover open, and through a lightweight heartbeat.",
     },
     {
       icon: <Swift className="size-5" />,
-      title: "Native, private, free",
-      tagline: "Built in Swift. No accounts, no telemetry.",
+      title: "Native and quiet",
+      copy:
+        "Built in Swift for the menu bar, with local preferences and a small festival cache.",
     },
   ];
 
   return (
     <ShellWrapper>
-      <section className="space-y-3 p-2">
+      <section className="space-y-5 p-2">
         <header className="space-y-2">
-          <p className="text-sm text-muted-foreground">What you get</p>
+          <p className="text-sm text-muted-foreground">Current release</p>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
-            Built for daily glances
+            Ready for everyday menu bar use
           </h2>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Three things, done well.
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+            v{APP_VERSION} focuses on the thing a calendar cannot get wrong:
+            today should still be today after midnight, sleep, wake, and a long
+            running session.
           </p>
         </header>
 
-        <div className="flex flex-col">
-          {items.map((item, idx) => (
-            <div
-              key={item.title}
-              className={
-                "flex items-start gap-3 py-4" +
-                (idx < items.length - 1 ? " border-b border-border" : "")
-              }
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-md border bg-card text-foreground">
+        <div className="grid gap-3 md:grid-cols-3">
+          {items.map((item) => (
+            <article key={item.title} className="space-y-3 rounded-lg border p-4">
+              <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
                 {item.icon}
-              </span>
-              <div className="space-y-0.5 pt-0.5">
-                <h3 className="text-lg font-medium md:text-xl">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.tagline}</p>
               </div>
-            </div>
+              <div className="space-y-1">
+                <h3 className="font-medium">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {item.copy}
+                </p>
+              </div>
+            </article>
           ))}
         </div>
       </section>
@@ -139,27 +169,24 @@ function Features() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Previews                                                                  */
-/* -------------------------------------------------------------------------- */
-
 function Previews() {
   return (
     <ShellWrapper>
-      <section className="space-y-3 p-2">
+      <section className="space-y-5 p-2">
         <header className="space-y-2">
           <p className="text-sm text-muted-foreground">Preview</p>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
-            Made for both modes
+            A compact calendar that follows your Mac
           </h2>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Follows the system theme. Switches the moment you do.
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+            The popover keeps the calendar, selected day details, and festival
+            markers close without taking over the screen.
           </p>
         </header>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <PreviewCard src="/light.png" label="Light" />
-          <PreviewCard src="/dark.png" label="Dark" tone="dark" />
+          <PreviewCard src="/light.png" label="Light mode" />
+          <PreviewCard src="/dark.png" label="Dark mode" tone="dark" />
         </div>
       </section>
     </ShellWrapper>
@@ -179,13 +206,13 @@ function PreviewCard({
     <figure className="space-y-2">
       <div
         className={
-          "relative aspect-812/1316 w-full overflow-hidden rounded-xl border " +
+          "relative aspect-812/1316 w-full overflow-hidden rounded-lg border " +
           (tone === "dark" ? "bg-[oklch(0.16_0_0)]" : "bg-[oklch(0.97_0_0)]")
         }
       >
         <Image
           src={src}
-          alt={`Nepali Calendar in ${label.toLowerCase()} mode`}
+          alt={`Nepali Calendar in ${label.toLowerCase()}`}
           fill
           sizes="(min-width: 640px) 25rem, 100vw"
           className="object-cover"
@@ -198,29 +225,90 @@ function PreviewCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Install                                                                   */
-/* -------------------------------------------------------------------------- */
-
 function Install() {
   return (
     <ShellWrapper>
-      <section id="install" className="space-y-3 p-2 scroll-mt-20">
+      <section id="install" className="space-y-5 p-2 scroll-mt-20">
         <header className="space-y-2">
           <p className="text-sm text-muted-foreground">Install</p>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl">
-            One command and you&rsquo;re set
+            Website first, GitHub too
           </h2>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Paste, run, done. The script downloads the disk image, copies the
-            app into Applications, and tells macOS you trust the source.
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+            The website serves the same disk image used for GitHub releases.
+            The installer verifies the v{APP_VERSION} download before replacing
+            the app in Applications.
           </p>
         </header>
 
-        <CopyCommand
-          command="curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash"
-          shortcut="I"
-        />
+        <CopyCommand command={INSTALL_COMMAND} shortcut="I" />
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild size="sm" variant="outline">
+            <a href={DOWNLOAD_URL} download>
+              <Download className="size-4" />
+              Download DMG
+            </a>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <a href={GITHUB_RELEASE_URL} target="_blank" rel="noreferrer">
+              <ExternalLink className="size-4" />
+              GitHub releases
+            </a>
+          </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link href={MANIFEST_URL}>Build manifest</Link>
+          </Button>
+        </div>
+      </section>
+    </ShellWrapper>
+  );
+}
+
+function Trust() {
+  return (
+    <ShellWrapper>
+      <section className="grid gap-5 p-2 md:grid-cols-[1fr_1fr]">
+        <div className="space-y-3">
+          <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <ShieldCheck className="size-4" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-medium tracking-tight">
+              Private by default
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground">
+              Nepali Calendar has no account system, no analytics SDK, and no
+              telemetry. It stores only a festival cache and your language
+              preference on your Mac.
+            </p>
+            <Link
+              href="/privacy"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Read privacy details
+              <ExternalLink className="size-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="space-y-2 rounded-lg border bg-card p-4">
+          <p className="text-sm font-medium">Build verification</p>
+          <dl className="space-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center justify-between gap-3">
+              <dt>Version</dt>
+              <dd className="font-mono text-foreground">
+                {APP_VERSION} ({APP_BUILD})
+              </dd>
+            </div>
+            <div className="space-y-1">
+              <dt>SHA-256</dt>
+              <dd className="break-all font-mono text-xs text-foreground">
+                {DMG_SHA256}
+              </dd>
+            </div>
+          </dl>
+        </div>
       </section>
     </ShellWrapper>
   );

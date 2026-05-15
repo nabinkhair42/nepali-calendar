@@ -38,6 +38,7 @@ ln -s /Applications "$STAGE/Applications"
 
 # 3. Pull version for the volume label.
 VERSION="$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_DIR/Contents/Info.plist")"
+BUILD="$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP_DIR/Contents/Info.plist")"
 
 # 4. Build the .dmg (UDZO = compressed read-only).
 mkdir -p "$DIST_DIR"
@@ -56,14 +57,37 @@ hdiutil create \
 mkdir -p "$PUBLIC_DIR"
 cp "$DMG" "$PUBLIC_DIR/$APP_NAME.dmg"
 
-# 6. Cleanup stage
+# 6. Write a public build manifest for the website/installer/release notes.
+SHA256="$(shasum -a 256 "$DMG" | awk '{print $1}')"
+SIZE_BYTES="$(stat -f%z "$DMG")"
+CREATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+MANIFEST="$DIST_DIR/latest.json"
+cat > "$MANIFEST" <<JSON
+{
+  "name": "$DISPLAY_NAME",
+  "version": "$VERSION",
+  "build": "$BUILD",
+  "artifact": "$APP_NAME.dmg",
+  "downloadUrl": "https://calendar.nabinkhair.com.np/downloads/$APP_NAME.dmg",
+  "githubReleaseUrl": "https://github.com/nabinkhair42/nepali-calendar/releases/tag/v$VERSION",
+  "sha256": "$SHA256",
+  "sizeBytes": $SIZE_BYTES,
+  "createdAt": "$CREATED_AT"
+}
+JSON
+cp "$MANIFEST" "$PUBLIC_DIR/latest.json"
+
+# 7. Cleanup stage
 rm -rf "$STAGE"
 
 SIZE=$(du -h "$DMG" | awk '{print $1}')
 echo ""
 echo "✓ built $APP_NAME.dmg ($SIZE)"
+echo "  sha256: $SHA256"
 echo "  → $DMG"
 echo "  → $PUBLIC_DIR/$APP_NAME.dmg"
+echo "  → $MANIFEST"
+echo "  → $PUBLIC_DIR/latest.json"
 echo ""
 echo "  Next: deploy the web/ project to publish at"
 echo "        https://calendar.nabinkhair.com.np/downloads/$APP_NAME.dmg"

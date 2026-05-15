@@ -18,6 +18,9 @@
 set -euo pipefail
 
 DMG_URL="${NEPALI_CALENDAR_DMG_URL:-https://calendar.nabinkhair.com.np/downloads/NepaliCalendar.dmg}"
+APP_VERSION="${NEPALI_CALENDAR_VERSION:-0.1.2}"
+APP_BUILD="${NEPALI_CALENDAR_BUILD:-3}"
+EXPECTED_SHA256="${NEPALI_CALENDAR_DMG_SHA256:-40d6e2a9e21b41ad249edb796207613bc511d96824319e9077c6d2eabde374a2}"
 APP_NAME="NepaliCalendar.app"
 APP_DISPLAY="Nepali Calendar"
 APPLICATIONS_DIR="/Applications"
@@ -44,13 +47,24 @@ cleanup() {
 trap cleanup EXIT
 
 echo
-echo "$(cyan 'Nepali Calendar') $(gray 'installer')"
+echo "$(cyan 'Nepali Calendar') $(gray "installer v$APP_VERSION ($APP_BUILD)")"
 echo
 
-say "Downloading..."
+say "Downloading v$APP_VERSION..."
 curl -fSL --progress-bar "$DMG_URL" -o "$TMP_DMG" \
     || fail "Download failed. Check your connection or grab the .dmg manually:
    $DMG_URL"
+
+if [ -n "$EXPECTED_SHA256" ] && [ "$EXPECTED_SHA256" != "skip" ]; then
+    say "Verifying download..."
+    ACTUAL_SHA256="$(shasum -a 256 "$TMP_DMG" | awk '{print $1}')"
+    [ "$ACTUAL_SHA256" = "$EXPECTED_SHA256" ] || fail "Downloaded .dmg checksum did not match.
+   Expected: $EXPECTED_SHA256
+   Actual:   $ACTUAL_SHA256
+
+   Delete the download and try again, or inspect:
+   https://calendar.nabinkhair.com.np/downloads/latest.json"
+fi
 
 say "Mounting disk image..."
 MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -readonly -mountrandom /tmp 2>/dev/null \
@@ -60,6 +74,12 @@ MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -readonly -mountrandom /tmp 2>
 [ -d "$MOUNT_POINT" ] || fail "Could not mount the disk image."
 
 [ -d "$MOUNT_POINT/$APP_NAME" ] || fail "Image did not contain '$APP_NAME'. Was the download corrupted?"
+
+FOUND_VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$MOUNT_POINT/$APP_NAME/Contents/Info.plist" 2>/dev/null || true)"
+FOUND_BUILD="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$MOUNT_POINT/$APP_NAME/Contents/Info.plist" 2>/dev/null || true)"
+if [ "$FOUND_VERSION" != "$APP_VERSION" ] || [ "$FOUND_BUILD" != "$APP_BUILD" ]; then
+    fail "Disk image contains Nepali Calendar v${FOUND_VERSION:-unknown} (${FOUND_BUILD:-unknown}), expected v$APP_VERSION ($APP_BUILD)."
+fi
 
 # If it's already running, quit it before overwriting — otherwise the
 # Mach-O is in use and `cp -R` may produce a broken bundle.
@@ -81,7 +101,7 @@ cp -R "$MOUNT_POINT/$APP_NAME" "$APPLICATIONS_DIR/"
 # this script you've already vouched for the source.
 xattr -dr com.apple.quarantine "$APPLICATIONS_DIR/$APP_NAME" 2>/dev/null || true
 
-ok "Installed Nepali Calendar."
+ok "Installed Nepali Calendar v$APP_VERSION."
 echo
 echo "  $(gray 'Launch with:')  open '/Applications/$APP_NAME'"
 echo "  $(gray 'Or find it in') Spotlight."

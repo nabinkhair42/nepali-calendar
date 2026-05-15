@@ -15,10 +15,20 @@ final class AppState: ObservableObject {
     private var heartbeatTimer: Timer?
     private var wakeObserver: NSObjectProtocol?
     private var sleepObserver: NSObjectProtocol?
+    private var timeChangeObservers: [NSObjectProtocol] = []
+    private var followsToday = true
+    private let dateProvider: () -> Date
+    private let timeZoneProvider: () -> TimeZone
 
-    init() {
-        let now = Date()
-        let bs = (try? BSConverter.toBS(now, in: .current)) ?? BSDate(year: 2082, month: 1, day: 1)
+    init(
+        dateProvider: @escaping () -> Date = Date.init,
+        timeZoneProvider: @escaping () -> TimeZone = { TimeZone.autoupdatingCurrent },
+        startAutomaticRefresh: Bool = true
+    ) {
+        self.dateProvider = dateProvider
+        self.timeZoneProvider = timeZoneProvider
+        let now = dateProvider()
+        let bs = (try? BSConverter.toBS(now, in: timeZoneProvider())) ?? BSDate(year: 2082, month: 1, day: 1)
         self.today = bs
         self.viewing = BSDate(year: bs.year, month: bs.month, day: 1)
         self.selected = bs
@@ -28,9 +38,12 @@ final class AppState: ObservableObject {
         } else {
             self.localeMode = .nepali
         }
-        scheduleMidnightTick()
-        scheduleHeartbeat()
-        observeSystemPower()
+        if startAutomaticRefresh {
+            scheduleMidnightTick()
+            scheduleHeartbeat()
+            observeSystemPower()
+            observeSystemClockChanges()
+        }
     }
 
     deinit {
@@ -39,22 +52,28 @@ final class AppState: ObservableObject {
         let nc = NSWorkspace.shared.notificationCenter
         if let wakeObserver { nc.removeObserver(wakeObserver) }
         if let sleepObserver { nc.removeObserver(sleepObserver) }
+        for observer in timeChangeObservers {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     /// Move to the previous month and snap selection to its first day.
     func goPrev() {
+        followsToday = false
         viewing = viewing.adding(months: -1)
         selected = BSDate(year: viewing.year, month: viewing.month, day: 1)
     }
 
     /// Move to the next month and snap selection to its first day.
     func goNext() {
+        followsToday = false
         viewing = viewing.adding(months: 1)
         selected = BSDate(year: viewing.year, month: viewing.month, day: 1)
     }
 
     /// Jump to today: viewing = today's month, selected = today.
     func goToday() {
+        followsToday = true
         viewing = BSDate(year: today.year, month: today.month, day: 1)
         selected = today
     }
@@ -62,6 +81,7 @@ final class AppState: ObservableObject {
     /// Select a specific day. The grid only emits dates inside the viewing
     /// month, so this won't push selection out of view.
     func select(_ date: BSDate) {
+        followsToday = date == today
         selected = date
     }
 
@@ -70,14 +90,21 @@ final class AppState: ObservableObject {
         UserDefaults.standard.set(localeMode == .nepali ? "nepali" : "english", forKey: "localeMode")
     }
 
-    /// Recompute `today` from wall-clock now. Cheap (no I/O), idempotent —
+    /// Recompute date state from wall-clock now. Cheap (no I/O), idempotent —
     /// safe to call from any of the refresh paths (midnight, wake, popover,
-    /// heartbeat). Only assigns when the day actually flipped so `@Published`
-    /// doesn't churn views every minute.
+    /// heartbeat). When the UI is naturally tracking today, keep the selected
+    /// day and visible month in lockstep with the new date; otherwise preserve
+    /// the user's manual calendar selection.
     func refreshToday() {
-        guard let bs = try? BSConverter.toBS(Date(), in: .current) else { return }
-        if bs != today {
-            today = bs
+        guard let bs = try? BSConverter.toBS(dateProvider(), in: timeZoneProvider()),
+              bs != today else {
+            return
+        }
+
+        today = bs
+        if followsToday {
+            viewing = Self.monthStart(for: bs)
+            selected = bs
         }
     }
 
@@ -85,18 +112,20 @@ final class AppState: ObservableObject {
     /// On its own this is fragile — `Timer` doesn't fire while the Mac is asleep, so we
     /// also wire wake + heartbeat + popover-open as backstops (see issue #1).
     private func scheduleMidnightTick() {
-        let cal = Calendar.current
-        let now = Date()
+        let cal = Calendar.autoupdatingCurrent
+        let now = dateProvider()
         guard let nextMidnight = cal.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 5), matchingPolicy: .nextTime) else { return }
         let interval = nextMidnight.timeIntervalSince(now)
         midnightTimer?.invalidate()
-        midnightTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+        let timer = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.refreshToday()
                 self.scheduleMidnightTick()
             }
         }
+        RunLoop.main.add(timer, forMode: .common)
+        midnightTimer = timer
     }
 
     /// 60-second backstop. After a sleep, `Timer` will start firing again on
@@ -140,5 +169,28 @@ final class AppState: ObservableObject {
                 self.scheduleMidnightTick()
             }
         }
+    }
+
+    /// Manual clock edits and timezone changes can make the current
+    /// midnight timer point at the wrong wall-clock boundary. Refresh
+    /// immediately, then re-arm relative to the new system settings.
+    private func observeSystemClockChanges() {
+        let center = NotificationCenter.default
+        timeChangeObservers = [
+            Notification.Name.NSSystemClockDidChange,
+            Notification.Name.NSSystemTimeZoneDidChange
+        ].map { name in
+            center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor in
+                    guard let self else { return }
+                    self.refreshToday()
+                    self.scheduleMidnightTick()
+                }
+            }
+        }
+    }
+
+    private static func monthStart(for date: BSDate) -> BSDate {
+        BSDate(year: date.year, month: date.month, day: 1)
     }
 }

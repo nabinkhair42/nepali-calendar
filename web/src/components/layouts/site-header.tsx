@@ -5,7 +5,7 @@ import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Kbd } from "@/components/ui/kbd";
 import {
   Tooltip,
@@ -31,9 +31,6 @@ export function SiteHeader() {
   const { setTheme, resolvedTheme } = useTheme();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > SCROLL_THRESHOLD);
@@ -112,7 +109,7 @@ export function SiteHeader() {
                 aria-label="Toggle theme"
                 className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
               >
-                {mounted && resolvedTheme === "dark" ? (
+                {resolvedTheme === "dark" ? (
                   <Moon className="size-4" strokeWidth={1.6} />
                 ) : (
                   <Sun className="size-4" strokeWidth={1.6} />

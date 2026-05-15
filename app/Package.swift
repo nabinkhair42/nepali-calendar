@@ -23,6 +23,11 @@ let package = Package(
             name: "NepaliCalendarVerify",
             dependencies: ["BSCore"],
             path: "Sources/NepaliCalendarVerify"
+        ),
+        .testTarget(
+            name: "NepaliCalendarTests",
+            dependencies: ["NepaliCalendar"],
+            path: "Tests/NepaliCalendarTests"
         )
     ]
 )
