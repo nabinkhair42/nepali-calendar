@@ -95,7 +95,7 @@ function PreviewCard({
           alt={`Nepali Calendar in ${label.toLowerCase()}`}
           fill
           sizes="(min-width: 640px) 25rem, 100vw"
-          className="object-cover"
+          className="object-contain"
         />
       </div>
       <figcaption className="px-1 text-xs text-muted-foreground">
