@@ -77,6 +77,20 @@ cat > "$MANIFEST" <<JSON
 JSON
 cp "$MANIFEST" "$PUBLIC_DIR/latest.json"
 
+# 6b. Keep the curl-pipe-bash installer (web/public/install.sh) in sync.
+#     It pins APP_VERSION / APP_BUILD / EXPECTED_SHA256 so the version
+#     mismatch check inside the script can spot a corrupted download.
+#     Without this step those values silently drift behind every release.
+INSTALL_SH="$ROOT/../web/public/install.sh"
+if [ -f "$INSTALL_SH" ]; then
+    /usr/bin/sed -i '' \
+        -e "s|NEPALI_CALENDAR_VERSION:-[^}]*|NEPALI_CALENDAR_VERSION:-$VERSION|" \
+        -e "s|NEPALI_CALENDAR_BUILD:-[^}]*|NEPALI_CALENDAR_BUILD:-$BUILD|" \
+        -e "s|NEPALI_CALENDAR_DMG_SHA256:-[^}]*|NEPALI_CALENDAR_DMG_SHA256:-$SHA256|" \
+        "$INSTALL_SH"
+    echo "  → $INSTALL_SH (patched v$VERSION / $BUILD / ${SHA256:0:12}…)"
+fi
+
 # 7. Cleanup stage
 rm -rf "$STAGE"
 
