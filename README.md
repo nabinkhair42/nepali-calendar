@@ -24,6 +24,16 @@ Nepali Calendar lives in the menu bar and stays out of the way until you need it
 - want a Nepali calendar that respects the rest of their desktop — no docks, no notifications, no analytics.
 - like keyboard shortcuts: **⌘←/⌘→** for months, **⌘T** for today, **⌘L** for language, **⌘,** for settings, **⌘Q** to quit.
 
+## Install
+
+One command from Terminal:
+
+```bash
+curl -fsSL https://calendar.nabinkhair.com.np/install.sh | bash
+```
+
+The installer fetches the latest build, verifies its SHA-256 against the published manifest, copies the app into `/Applications`, and launches it. Safe to re-run — it cleanly replaces any existing copy. After the first install, the app keeps itself current via the built-in updater; this command is just the bootstrap.
+
 ## Privacy
 
 No accounts. No analytics SDKs. No tracking scripts. The app stores a small local festival cache and your language preference on your Mac — nothing leaves your machine except the festival fetch and the update check.
@@ -33,7 +43,6 @@ No accounts. No analytics SDKs. No tracking scripts. The app stores a small loca
 ## Links
 
 - **Website** — <https://calendar.nabinkhair.com.np>
-- **Download** — <https://calendar.nabinkhair.com.np/downloads/NepaliCalendar.dmg>
 - **Changelog** — <https://calendar.nabinkhair.com.np/changelog>
 - **GitHub releases** — <https://github.com/nabinkhair42/nepali-calendar/releases>
 

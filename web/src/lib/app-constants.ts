@@ -28,3 +28,5 @@ export const DMG_FILENAME = `${BUNDLE_NAME}.dmg`;
 export const DOWNLOAD_URL = `/downloads/${DMG_FILENAME}`;
 export const MANIFEST_URL = "/downloads/latest.json";
 export const GITHUB_RELEASES_URL = `https://github.com/${GITHUB_REPO}/releases`;
+
+export const INSTALL_COMMAND = `curl -fsSL https://${WEBSITE_HOST}/install.sh | bash`;

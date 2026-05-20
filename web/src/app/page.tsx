@@ -1,13 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, ShieldCheck } from "lucide-react";
-import { Apple } from "@/components/apple-icons";
+import { CopyCommand } from "@/components/copy-command";
 import { ShellWrapper } from "@/components/layouts/shell-wrapper";
-import { Button } from "@/components/ui/button";
 import {
   DISPLAY_NAME,
-  DOWNLOAD_URL,
   GITHUB_RELEASES_URL,
+  INSTALL_COMMAND,
 } from "@/lib/app-constants";
 import latestBuild from "../../public/downloads/latest.json";
 
@@ -50,12 +49,13 @@ function Hero() {
             </p>
           </div>
 
-          <Button asChild>
-            <a href={DOWNLOAD_URL} download>
-              <Apple className="size-4" />
-              Download for macOS
-            </a>
-          </Button>
+          <div className="space-y-2">
+            <CopyCommand command={INSTALL_COMMAND} />
+            <p className="text-xs text-muted-foreground">
+              One command. Verifies the build, installs to{" "}
+              <span className="font-mono">/Applications</span>, and launches.
+            </p>
+          </div>
         </div>
       </section>
     </ShellWrapper>

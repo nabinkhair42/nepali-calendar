@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, History, Moon, Sun } from "lucide-react";
+import { History, Moon, Sun } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 
 const SPRING = { type: "spring" as const, stiffness: 360, damping: 32, mass: 0.85 };
 const SCROLL_THRESHOLD = 32;
-const DMG_URL = "/downloads/NepaliCalendar.dmg";
 
 /**
  * Sticky header that shrinks into a floating pill when scrolled.
@@ -25,7 +24,7 @@ const DMG_URL = "/downloads/NepaliCalendar.dmg";
  *   - Scrolled: ~290px pill, glass background
  *
  * Left:  app icon + "calendar." wordmark
- * Right: Download icon, theme toggle — each tooltip + Kbd badge
+ * Right: changelog link, theme toggle — each tooltip + Kbd badge
  */
 export function SiteHeader() {
   const { setTheme, resolvedTheme } = useTheme();
@@ -101,23 +100,6 @@ export function SiteHeader() {
             <TooltipContent className="flex items-center gap-2">
               Changelog
               <Kbd>C</Kbd>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={DMG_URL}
-                download
-                aria-label="Download for macOS"
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
-              >
-                <Download className="size-4" strokeWidth={1.6} />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              Download
-              <Kbd>D</Kbd>
             </TooltipContent>
           </Tooltip>
 

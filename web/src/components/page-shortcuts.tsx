@@ -3,12 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
-
-const DMG_URL = "/downloads/NepaliCalendar.dmg";
+import { INSTALL_COMMAND } from "@/lib/app-constants";
 
 /**
  * Global keyboard shortcuts:
- *   D — trigger the .dmg download
+ *   D — copy the install command to the clipboard
  *   C — go to the /changelog page
  *   T — toggle light / dark theme
  *
@@ -38,12 +37,14 @@ export function PageShortcuts() {
 
       if (k === "d") {
         e.preventDefault();
-        const a = document.createElement("a");
-        a.href = DMG_URL;
-        a.download = "NepaliCalendar.dmg";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        navigator.clipboard
+          .writeText(INSTALL_COMMAND)
+          .then(() => {
+            window.dispatchEvent(new Event("nepalicalendar:copy-install"));
+          })
+          .catch(() => {
+            /* clipboard fails on insecure contexts; no-op */
+          });
       } else if (k === "c") {
         e.preventDefault();
         router.push("/changelog");
