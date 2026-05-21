@@ -17,24 +17,13 @@ import { cn } from "@/lib/utils";
 const SPRING = { type: "spring" as const, stiffness: 360, damping: 32, mass: 0.85 };
 const SCROLL_THRESHOLD = 32;
 
-/**
- * Sticky header that shrinks into a floating pill when scrolled.
- * Mirrors the portfolio's nav rhythm:
- *   - At top: full-width 50rem strip, transparent
- *   - Scrolled: ~290px pill, glass background
- *
- * Left:  app icon + "calendar." wordmark
- * Right: changelog link, theme toggle — each tooltip + Kbd badge
- */
+
 export function SiteHeader() {
   const { setTheme, resolvedTheme } = useTheme();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  // next-themes resolves `resolvedTheme` only on the client; rendering the
-  // icon based on it during SSR causes a hydration mismatch when the
-  // resolved value differs from the server default. Gate the icon swap on
-  // a post-mount flag so the first paint matches what the server sent.
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {

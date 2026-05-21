@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, ShieldCheck } from "lucide-react";
+import { ArrowRight, ExternalLink, ShieldCheck } from "lucide-react";
 import { CopyCommand } from "@/components/copy-command";
 import { ShellWrapper } from "@/components/layouts/shell-wrapper";
 import {
@@ -26,35 +26,65 @@ export default function Page() {
 function Hero() {
   return (
     <ShellWrapper>
-      <section className="grid gap-6 p-2 md:grid-cols-[8rem_1fr] md:items-center">
-        <div className="relative size-28 shrink-0 md:size-32">
-          <Image
-            src="/icon.svg"
-            alt={`${DISPLAY_NAME} app icon`}
-            fill
-            sizes="(min-width: 768px) 128px, 112px"
-            priority
-            className="object-cover"
-          />
-        </div>
+      <section className="relative overflow-hidden px-2 py-6 md:py-8">
+        {/* Brand-tinted radial glow sitting behind the icon. Sized large
+            enough to feather to transparent before the section's hairline
+            divider so the section still reads as a flat band. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-72 w-xl -translate-x-1/2 bg-[radial-gradient(closest-side,oklch(0.65_0.21_23/0.22),transparent_72%)] blur-2xl dark:bg-[radial-gradient(closest-side,oklch(0.7_0.21_23/0.28),transparent_72%)]"
+        />
 
-        <div className="min-w-0 space-y-5">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
-              {DISPLAY_NAME}
-            </h1>
-            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Bikram Sambat in your macOS menu bar — festivals, public
-              holidays, and a quiet popover that gets out of the way.
-            </p>
+        <div className="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+          {/* What's-new pill — a quiet hook into the changelog without
+              taking up a full section. */}
+          <Link
+            href="/changelog"
+            className="group mb-8 inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs text-muted-foreground shadow-xs backdrop-blur-sm transition-colors hover:border-foreground/20 hover:bg-card hover:text-foreground"
+          >
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+            </span>
+            <span>New in v{APP_VERSION}</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="inline-flex items-center gap-1 underline-offset-4 group-hover:underline">
+              Changelog
+              <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+
+          <div className="relative mb-7 size-32 md:size-36">
+            <Image
+              src="/icon.svg"
+              alt={`${DISPLAY_NAME} app icon`}
+              fill
+              sizes="(min-width: 768px) 144px, 128px"
+              priority
+              className="object-contain drop-shadow-[0_12px_28px_oklch(0.61_0.21_23/0.35)]"
+            />
           </div>
 
-          <div className="space-y-2">
-            <CopyCommand command={INSTALL_COMMAND} />
-            <p className="text-xs text-muted-foreground">
-              One command. Verifies the build, installs to{" "}
-              <span className="font-mono">/Applications</span>, and launches.
-            </p>
+          <h1 className="bg-linear-to-b from-foreground to-foreground/70 bg-clip-text text-5xl font-medium tracking-tight text-transparent md:text-6xl">
+            {DISPLAY_NAME}
+          </h1>
+          <p className="mt-4 max-w-xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+            Bikram Sambat in your macOS menu bar — festivals, public holidays,
+            and a quiet popover that gets out of the way.
+          </p>
+
+          <div className="mt-8 w-full max-w-xl space-y-3">
+            <CopyCommand command={INSTALL_COMMAND} shortcut="D" />
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="size-3.5" />
+                SHA-256 verified
+              </span>
+              <span className="text-muted-foreground/40">·</span>
+              <span>No telemetry</span>
+              <span className="text-muted-foreground/40">·</span>
+              <span>macOS 14 or later</span>
+            </div>
           </div>
         </div>
       </section>

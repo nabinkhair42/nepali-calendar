@@ -5,11 +5,6 @@ interface ShellWrapperProps {
   children: React.ReactNode;
 }
 
-/**
- * Section container with hairline rules at top and bottom and a constrained
- * inner column. Mirrors the portfolio's content rhythm — each section sits
- * inside its own ShellWrapper so the dividers stack visually as you scroll.
- */
 export function ShellWrapper({ className, children }: ShellWrapperProps) {
   return (
     <section className={cn("relative isolate w-full overflow-visible", className)}>
