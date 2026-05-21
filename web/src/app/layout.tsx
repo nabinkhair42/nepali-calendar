@@ -55,8 +55,8 @@ export default function RootLayout({
         >
           <TooltipProvider delayDuration={150}>
             <PageShortcuts />
-            <div className="relative grid min-h-screen w-full grid-cols-[1fr_min(50rem,calc(100%-3rem))_1fr]">
-              <div className="col-start-2 flex min-h-screen w-full flex-col">
+            <div className="relative grid min-h-screen w-full grid-cols-[1fr_min(50rem,calc(100%-3rem))_1fr] overflow-x-clip">
+              <div className="col-start-2 flex min-h-screen w-full min-w-0 flex-col">
                 <SiteHeader />
                 <main id="main-content" className="flex flex-1 flex-col">
                   {children}

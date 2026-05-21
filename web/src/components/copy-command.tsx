@@ -62,7 +62,7 @@ export function CopyCommand({ command, shortcut }: Props) {
       aria-label={copied ? "Copied" : "Copy command"}
       className="group relative flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card pl-4 pr-3 py-0.5 transition-colors hover:bg-muted/40 outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
     >
-      <pre className="flex-1 font-mono text-[13px] leading-6 overflow-x-auto text-foreground py-0.5">
+      <pre className="min-w-0 flex-1 font-mono text-[13px] leading-6 overflow-x-auto text-foreground py-0.5">
         <span className="text-muted-foreground select-none">$ </span>
         {command}
       </pre>

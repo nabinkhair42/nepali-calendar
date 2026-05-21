@@ -38,7 +38,7 @@ function Hero() {
           />
         </div>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <div className="space-y-2">
             <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
               {DISPLAY_NAME}
