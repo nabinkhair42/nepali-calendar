@@ -6,8 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-inter);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -31,62 +30,49 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.97 0 0);
-  --foreground: oklch(0.22 0 0);
-  --card: oklch(0.99 0 0);
-  --card-foreground: oklch(0.22 0 0);
-  --popover: oklch(0.99 0 0);
-  --popover-foreground: oklch(0.22 0 0);
-  /* Brand red — matches the icon's #C52E41/#EE4757 gradient. */
-  --primary: oklch(0.61 0.21 23);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.94 0 0);
-  --secondary-foreground: oklch(0.22 0 0);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.42 0 0);
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0.22 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0 0);
-  --input: oklch(0.91 0 0);
-  --ring: oklch(0.65 0 0);
-  --pattern-fg: oklch(92.191% 0.0001 271.152);
+  --radius: 0.5rem;
+  /* Brand hue 23° (icon crimson). Neutrals carry a whisper of it. */
+  --background: oklch(0.978 0.006 23);
+  --foreground: oklch(0.22 0.014 23);
+  --card: oklch(0.995 0.003 23);
+  --card-foreground: oklch(0.22 0.014 23);
+  --popover: oklch(0.995 0.003 23);
+  --popover-foreground: oklch(0.22 0.014 23);
+  --primary: oklch(0.545 0.195 23);
+  --primary-foreground: oklch(0.99 0.002 23);
+  --secondary: oklch(0.945 0.008 23);
+  --secondary-foreground: oklch(0.22 0.014 23);
+  --muted: oklch(0.945 0.008 23);
+  --muted-foreground: oklch(0.42 0.018 23);
+  --accent: oklch(0.945 0.008 23);
+  --accent-foreground: oklch(0.22 0.014 23);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.9 0.01 23);
+  --input: oklch(0.9 0.01 23);
+  --ring: oklch(0.545 0.195 23);
+  --selection: oklch(0.545 0.195 23 / 0.18);
 }
 
 .dark {
-  --background: oklch(0.16 0 0);
-  --foreground: oklch(0.9 0 0);
-  --card: oklch(0.21 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.21 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  /* Brand red, slightly brighter so it carries on the dark background. */
-  --primary: oklch(0.68 0.21 23);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.27 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.27 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.27 0 0);
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 18%);
-  --ring: oklch(0.56 0 0);
-  --pattern-fg: oklch(1 0 0 / 14%);
-}
-
-@utility pattern-hatch {
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--pattern-fg) 0,
-    var(--pattern-fg) 1px,
-    transparent 0,
-    transparent 50%
-  );
-  background-size: 10px 10px;
-  background-attachment: fixed;
+  --background: oklch(0.165 0.01 23);
+  --foreground: oklch(0.93 0.008 23);
+  --card: oklch(0.21 0.012 23);
+  --card-foreground: oklch(0.95 0.006 23);
+  --popover: oklch(0.21 0.012 23);
+  --popover-foreground: oklch(0.95 0.006 23);
+  --primary: oklch(0.68 0.185 23);
+  --primary-foreground: oklch(0.18 0.02 23);
+  --secondary: oklch(0.26 0.012 23);
+  --secondary-foreground: oklch(0.95 0.006 23);
+  --muted: oklch(0.26 0.012 23);
+  --muted-foreground: oklch(0.68 0.015 23);
+  --accent: oklch(0.26 0.012 23);
+  --accent-foreground: oklch(0.95 0.006 23);
+  --destructive: oklch(0.68 0.18 22);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.68 0.185 23);
+  --selection: oklch(0.68 0.185 23 / 0.28);
 }
 
 @layer base {
@@ -94,7 +80,15 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    font-synthesis: none;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-base leading-[1.6] text-foreground;
+  }
+
+  ::selection {
+    background: var(--selection);
   }
 }

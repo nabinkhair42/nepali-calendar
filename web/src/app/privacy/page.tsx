@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Download, HardDrive, ShieldCheck } from "lucide-react";
 import { ShellWrapper } from "@/components/layouts/shell-wrapper";
 
 export const metadata: Metadata = {
@@ -12,42 +11,49 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = "May 15, 2026";
 
+const linkClass =
+  "font-medium text-foreground underline decoration-from-font underline-offset-4 transition-colors hover:text-primary";
+
 export default function PrivacyPage() {
   return (
     <div className="py-8">
       <ShellWrapper>
-        <article className="space-y-8 p-2">
+        <article className="space-y-10 p-2">
           <header className="space-y-2">
-            <p className="text-sm text-muted-foreground">Privacy</p>
-            <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
+            <p className="text-sm font-medium text-muted-foreground">
+              Privacy
+            </p>
+            <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-[-0.025em] md:text-5xl">
               Private by default, boring on purpose
             </h1>
-            <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
+            <p className="max-w-2xl text-pretty text-lg leading-[1.6] text-muted-foreground">
               Last updated {LAST_UPDATED}. Nepali Calendar is a local macOS
               menu bar app with no accounts, no analytics SDKs, and no
               third-party tracking scripts.
             </p>
           </header>
 
-          <section className="grid gap-3 md:grid-cols-3">
-            <PrivacyPoint
-              icon={<ShieldCheck className="size-4" />}
-              title="No identity"
-              copy="No name, email, account, advertising ID, or device profile is collected."
-            />
-            <PrivacyPoint
-              icon={<HardDrive className="size-4" />}
-              title="Local settings"
-              copy="The app keeps only a festival cache and your Nepali/English preference on your Mac."
-            />
-            <PrivacyPoint
-              icon={<Download className="size-4" />}
-              title="Verified installer"
-              copy="The website installer verifies the downloaded disk image before copying the app."
-            />
-          </section>
+          <ul className="max-w-2xl space-y-3 text-base leading-[1.6] text-muted-foreground">
+            <li>
+              <span className="font-medium text-foreground">No identity.</span>{" "}
+              No name, email, account, advertising ID, or device profile is
+              collected.
+            </li>
+            <li>
+              <span className="font-medium text-foreground">Local settings.</span>{" "}
+              The app keeps only a festival cache and your Nepali/English
+              preference on your Mac.
+            </li>
+            <li>
+              <span className="font-medium text-foreground">
+                Verified installer.
+              </span>{" "}
+              The website installer verifies the downloaded disk image before
+              copying the app.
+            </li>
+          </ul>
 
-          <div className="space-y-7">
+          <div className="space-y-8">
             <Section title="What stays on your Mac">
               <p>
                 Nepali Calendar stores its festival cache at{" "}
@@ -90,10 +96,7 @@ export default function PrivacyPage() {
               </p>
               <p>
                 The current public build manifest is available at{" "}
-                <Link
-                  href="/downloads/latest.json"
-                  className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-primary"
-                >
+                <Link href="/downloads/latest.json" className={linkClass}>
                   /downloads/latest.json
                 </Link>
                 .
@@ -101,7 +104,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section title="What is never collected">
-              <ul className="list-disc space-y-1.5 pl-5">
+              <ul className="list-disc space-y-1.5 ps-5">
                 <li>Account details, email addresses, or names</li>
                 <li>Calendar events from your Mac</li>
                 <li>Crash reports, telemetry, or usage events</li>
@@ -113,10 +116,7 @@ export default function PrivacyPage() {
             <Section title="Contact">
               <p>
                 Questions, requests, or concerns:{" "}
-                <a
-                  href="mailto:nabinkhair12@gmail.com"
-                  className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-primary"
-                >
+                <a href="mailto:nabinkhair12@gmail.com" className={linkClass}>
                   nabinkhair12@gmail.com
                 </a>
                 .
@@ -129,28 +129,6 @@ export default function PrivacyPage() {
   );
 }
 
-function PrivacyPoint({
-  icon,
-  title,
-  copy,
-}: {
-  icon: ReactNode;
-  title: string;
-  copy: string;
-}) {
-  return (
-    <article className="space-y-3 rounded-lg border p-4">
-      <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
-        {icon}
-      </div>
-      <div className="space-y-1">
-        <h2 className="font-medium">{title}</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">{copy}</p>
-      </div>
-    </article>
-  );
-}
-
 function Section({
   title,
   children,
@@ -159,9 +137,11 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-2 border-t pt-5 first:border-t-0 first:pt-0">
-      <h2 className="text-lg font-medium tracking-tight md:text-xl">{title}</h2>
-      <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
+    <section className="space-y-2">
+      <h2 className="text-xl font-semibold leading-[1.2] tracking-[-0.015em] md:text-2xl">
+        {title}
+      </h2>
+      <div className="max-w-2xl space-y-3 text-pretty text-base leading-[1.6] text-muted-foreground">
         {children}
       </div>
     </section>
@@ -170,7 +150,7 @@ function Section({
 
 function Code({ children }: { children: ReactNode }) {
   return (
-    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[12.5px] text-foreground">
+    <code className="break-words rounded bg-muted px-1.5 py-0.5 text-sm text-foreground">
       {children}
     </code>
   );

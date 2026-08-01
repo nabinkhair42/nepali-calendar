@@ -1,21 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Kbd } from "@/components/ui/kbd";
+import { AnimatePresence, motion } from "motion/react";
 import { CheckIcon, CopyIcon } from "lucide-react";
+import { Kbd } from "@/components/ui/kbd";
 
 interface Props {
-  /** Command to copy to clipboard. Shown verbatim with a leading "$ ". */
   command: string;
-  /** Optional shortcut key shown as a Kbd badge. */
   shortcut?: string;
 }
 
-/**
- * Terminal-styled block with click-to-copy. Listens for a global
- * `nepalicalendar:copy-install` window event so the card flashes "Copied"
- * even when the copy was triggered by the page-level keyboard shortcut.
- */
+const ICON_SPRING = { type: "spring" as const, duration: 0.3, bounce: 0 };
+
 export function CopyCommand({ command, shortcut }: Props) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<number | null>(null);
@@ -30,9 +26,7 @@ export function CopyCommand({ command, shortcut }: Props) {
     try {
       await navigator.clipboard.writeText(command);
       flashCopied();
-    } catch {
-      // Clipboard API fails on insecure contexts; no-op.
-    }
+    } catch {}
   }
 
   useEffect(() => {
@@ -60,17 +54,34 @@ export function CopyCommand({ command, shortcut }: Props) {
       onClick={copy}
       onKeyDown={onKeyDown}
       aria-label={copied ? "Copied" : "Copy command"}
-      className="group relative flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card pl-4 pr-3 py-0.5 transition-colors hover:bg-muted/40 outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+      className="group relative flex cursor-pointer items-center gap-3 rounded-xl bg-muted/60 py-1 pl-4 pr-3 outline-none transition-[background-color,transform] duration-150 ease-out hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 active:scale-[0.96]"
     >
-      <pre className="min-w-0 flex-1 font-mono text-[13px] leading-6 overflow-x-auto text-foreground py-0.5">
-        <span className="text-muted-foreground select-none">$ </span>
+      <pre className="min-w-0 flex-1 overflow-x-auto py-1.5 text-sm leading-6 text-foreground">
+        <span className="select-none text-muted-foreground">$ </span>
         {command}
       </pre>
       <span
         aria-hidden
-        className="shrink-0 inline-flex h-6 items-center gap-1.5 px-1 text-muted-foreground transition-colors group-hover:text-foreground"
+        className="relative inline-flex h-8 min-w-8 shrink-0 select-none items-center justify-center gap-1.5 text-muted-foreground transition-colors duration-150 group-hover:text-foreground"
       >
-        {copied ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
+        <span className="relative size-4">
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.span
+              key={copied ? "check" : "copy"}
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+              transition={ICON_SPRING}
+            >
+              {copied ? (
+                <CheckIcon className="size-4" />
+              ) : (
+                <CopyIcon className="size-4" />
+              )}
+            </motion.span>
+          </AnimatePresence>
+        </span>
         {shortcut && !copied && <Kbd>{shortcut}</Kbd>}
       </span>
     </div>

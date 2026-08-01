@@ -16,31 +16,23 @@ const KIND_LABEL: Record<ChangeKind, string> = {
   internal: "Internal",
 };
 
-const KIND_CLASSES: Record<ChangeKind, string> = {
-  feat: "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/18 dark:text-emerald-300",
-  fix: "bg-amber-500/15 text-amber-700 dark:bg-amber-500/18 dark:text-amber-300",
-  ui: "bg-sky-500/15 text-sky-700 dark:bg-sky-500/18 dark:text-sky-300",
-  internal:
-    "bg-foreground/8 text-foreground/65 dark:bg-foreground/10 dark:text-foreground/70",
-};
-
 export default function ChangelogPage() {
   return (
-    <div className="flex flex-col gap-8 py-8">
+    <div className="flex flex-col gap-10 py-8">
       <ShellWrapper>
         <header className="space-y-3 p-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="inline-flex items-center gap-1 text-base leading-normal text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline hover:decoration-from-font"
           >
             <ChevronLeft className="size-3.5" />
             Back to home
           </Link>
-          <div className="space-y-1">
-            <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
+          <div className="space-y-1.5">
+            <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-[-0.025em] md:text-6xl">
               Changelog
             </h1>
-            <p className="text-base text-muted-foreground">
+            <p className="max-w-2xl text-pretty text-lg leading-[1.6] text-muted-foreground">
               Release notes for the macOS menu bar app.
             </p>
           </div>
@@ -48,26 +40,23 @@ export default function ChangelogPage() {
       </ShellWrapper>
 
       <ShellWrapper>
-        <section className="space-y-8 p-2">
+        <section className="space-y-10 p-2">
           {releases.map((release) => (
-            <article
-              key={release.version}
-              className="space-y-4 border-b pb-8 last:border-b-0 last:pb-0"
-            >
+            <article key={release.version} className="space-y-4">
               <header className="space-y-1">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h2 className="text-2xl font-medium tracking-tight">
-                    v{release.version}
+                  <h2 className="text-2xl font-semibold leading-[1.15] tracking-[-0.02em] md:text-3xl">
+                    <span className="tabular-nums">v{release.version}</span>
                   </h2>
-                  <span className="font-mono text-xs text-muted-foreground">
+                  <span className="text-sm tabular-nums text-muted-foreground">
                     build {release.build}
                   </span>
-                  <time className="text-sm text-muted-foreground">
+                  <time className="text-base leading-normal text-muted-foreground">
                     {formatDate(release.date)}
                   </time>
                 </div>
                 {release.highlight && (
-                  <p className="text-base text-muted-foreground">
+                  <p className="max-w-2xl text-pretty text-lg leading-[1.6] text-muted-foreground">
                     {release.highlight}
                   </p>
                 )}
@@ -79,15 +68,10 @@ export default function ChangelogPage() {
                     key={idx}
                     className="grid grid-cols-[4.5rem_1fr] items-baseline gap-3"
                   >
-                    <span
-                      className={
-                        "inline-flex w-fit items-center justify-self-end rounded px-1.5 py-[3px] text-[11px] font-semibold leading-none tracking-wide " +
-                        KIND_CLASSES[entry.kind]
-                      }
-                    >
+                    <span className="justify-self-end text-sm font-medium text-muted-foreground">
                       {KIND_LABEL[entry.kind]}
                     </span>
-                    <p className="text-sm leading-relaxed text-foreground/90">
+                    <p className="max-w-2xl text-pretty text-base leading-[1.6] text-foreground/90">
                       {entry.text}
                     </p>
                   </li>

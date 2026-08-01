@@ -9,22 +9,27 @@ export const metadata: Metadata = {
 
 const LAST_UPDATED = "May 10, 2026";
 
+const linkClass =
+  "font-medium text-foreground underline decoration-from-font underline-offset-4 transition-colors hover:text-primary";
+
 export default function TermsPage() {
   return (
     <div className="py-8">
       <ShellWrapper>
-        <article className="space-y-3 p-2">
+        <article className="space-y-8 p-2">
           <header className="space-y-2">
-            <p className="text-sm text-muted-foreground">Terms</p>
-            <h1 className="text-3xl font-medium tracking-tight md:text-4xl">
+            <p className="text-sm font-medium text-muted-foreground">
+              Terms
+            </p>
+            <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-[-0.025em] md:text-5xl">
               Plain-language terms
             </h1>
-            <p className="text-base leading-relaxed text-muted-foreground">
+            <p className="max-w-2xl text-pretty text-lg leading-[1.6] text-muted-foreground">
               Last updated {LAST_UPDATED}.
             </p>
           </header>
 
-          <div className="space-y-8 pt-4">
+          <div className="space-y-8">
             <Section title="License">
               <p>
                 Nepali Calendar is closed-source software. By installing and
@@ -47,7 +52,7 @@ export default function TermsPage() {
             <Section title="Festival data">
               <p>
                 Festival information is best-effort and may differ from
-                official government announcements, especially for newly-
+                official government announcements, especially for newly
                 declared holidays. Use the app for at-a-glance reference, not
                 for binding commitments. We make no warranty about the
                 accuracy or completeness of any specific date or festival.
@@ -80,7 +85,7 @@ export default function TermsPage() {
                 If you breach these terms, the license terminates
                 automatically. You can stop using the app at any time by
                 deleting it from /Applications and the cache directory at{" "}
-                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[12.5px]">
+                <code className="break-words rounded bg-muted px-1.5 py-0.5 text-sm">
                   ~/Library/Application Support/NepaliCalendar/
                 </code>
                 .
@@ -90,10 +95,7 @@ export default function TermsPage() {
             <Section title="Contact">
               <p>
                 For licensing, security disclosures, or anything else:{" "}
-                <a
-                  href="mailto:nabinkhair12@gmail.com"
-                  className="font-medium text-foreground underline underline-offset-2 transition-colors hover:text-primary"
-                >
+                <a href="mailto:nabinkhair12@gmail.com" className={linkClass}>
                   nabinkhair12@gmail.com
                 </a>
                 .
@@ -115,8 +117,10 @@ function Section({
 }) {
   return (
     <section className="space-y-2">
-      <h2 className="text-lg font-medium tracking-tight md:text-xl">{title}</h2>
-      <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
+      <h2 className="text-xl font-semibold leading-[1.2] tracking-[-0.015em] md:text-2xl">
+        {title}
+      </h2>
+      <div className="max-w-2xl space-y-3 text-pretty text-base leading-[1.6] text-muted-foreground">
         {children}
       </div>
     </section>

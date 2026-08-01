@@ -1,7 +1,7 @@
 "use client";
 
-import { History, Moon, Sun } from "lucide-react";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import { Moon, Sun } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,84 +12,52 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { DISPLAY_NAME, GITHUB_REPO } from "@/lib/app-constants";
 
-const SPRING = { type: "spring" as const, stiffness: 360, damping: 32, mass: 0.85 };
-const SCROLL_THRESHOLD = 32;
-
+const ICON_SPRING = { type: "spring" as const, duration: 0.3, bounce: 0 };
+const GITHUB_URL = `https://github.com/${GITHUB_REPO}`;
 
 export function SiteHeader() {
   const { setTheme, resolvedTheme } = useTheme();
-  const { scrollY } = useScroll();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > SCROLL_THRESHOLD);
-  });
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 flex justify-center transition-colors duration-200",
-        isScrolled ? "bg-transparent" : "bg-background/85 backdrop-blur-md"
-      )}
-    >
-      <motion.div
-        layout
-        transition={SPRING}
-        animate={{ borderRadius: isScrolled ? 999 : 0 }}
-        className={cn(
-          "flex items-center transition-[background-color,border-color,height] duration-200",
-          isScrolled
-            ? "mt-3 h-11 w-72 justify-between gap-2.5 border bg-background/85 px-3 backdrop-blur-md"
-            : "h-14 w-full max-w-200 justify-between gap-3 border-transparent px-2"
-        )}
-      >
-        <motion.div layout="position" className="shrink-0">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/"
-                aria-label="Home"
-                className="flex items-center gap-2 text-base font-medium tracking-tight outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring/40 rounded-sm"
-              >
-                <Image
-                  src="/icon.svg"
-                  alt=""
-                  width={22}
-                  height={22}
-                  className="rounded-sm"
-                  aria-hidden
-                />
-                <span>calendar.</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>Home</TooltipContent>
-          </Tooltip>
-        </motion.div>
-
-        <motion.nav
-          layout="position"
-          aria-label="Main navigation"
-          className="flex shrink-0 items-center gap-0.5"
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md">
+      <div className="flex h-14 w-full items-center justify-between gap-3 px-2">
+        <Link
+          href="/"
+          aria-label={DISPLAY_NAME}
+          className="flex select-none items-center gap-2 rounded-md text-lg font-semibold tracking-tight text-foreground outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring/40"
         >
+          <Image
+            src="/icon.svg"
+            alt=""
+            width={22}
+            height={22}
+            className="rounded-[5px] outline outline-1 outline-black/10 dark:outline-white/10"
+            aria-hidden
+          />
+          <span>calendar.</span>
+        </Link>
+
+        <nav aria-label="Main navigation" className="flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link
-                href="/changelog"
-                aria-label="Changelog"
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub"
+                className="relative flex size-10 select-none items-center justify-center rounded-md text-muted-foreground transition-[color,transform] duration-150 ease-out hover:text-foreground active:scale-[0.96]"
               >
-                <History className="size-4" strokeWidth={1.6} />
-              </Link>
+                <span className="text-sm font-semibold">GH</span>
+              </a>
             </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              Changelog
-              <Kbd>C</Kbd>
-            </TooltipContent>
+            <TooltipContent>GitHub</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -100,29 +68,43 @@ export function SiteHeader() {
                   setTheme(resolvedTheme === "light" ? "dark" : "light")
                 }
                 aria-label="Toggle theme"
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary"
+                className="relative flex size-10 select-none items-center justify-center rounded-md text-muted-foreground transition-[color,transform] duration-150 ease-out hover:text-foreground active:scale-[0.96]"
               >
-                {mounted ? (
-                  resolvedTheme === "dark" ? (
-                    <Moon className="size-4" strokeWidth={1.6} />
+                <span className="relative size-4">
+                  {mounted ? (
+                    <AnimatePresence initial={false} mode="popLayout">
+                      <motion.span
+                        key={isDark ? "moon" : "sun"}
+                        className="absolute inset-0 flex items-center justify-center"
+                        initial={{
+                          opacity: 0,
+                          scale: 0.25,
+                          filter: "blur(4px)",
+                        }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                        transition={ICON_SPRING}
+                      >
+                        {isDark ? (
+                          <Moon className="size-4" strokeWidth={1.6} />
+                        ) : (
+                          <Sun className="size-4" strokeWidth={1.6} />
+                        )}
+                      </motion.span>
+                    </AnimatePresence>
                   ) : (
-                    <Sun className="size-4" strokeWidth={1.6} />
-                  )
-                ) : (
-                  // Layout-preserving placeholder until next-themes resolves
-                  // on the client. Identical box size so the button doesn't
-                  // jump after mount.
-                  <span className="size-4" aria-hidden />
-                )}
+                    <span className="size-4" aria-hidden />
+                  )}
+                </span>
               </button>
             </TooltipTrigger>
             <TooltipContent className="flex items-center gap-2">
               Toggle theme
-              <Kbd>T</Kbd>
+              <Kbd>D</Kbd>
             </TooltipContent>
           </Tooltip>
-        </motion.nav>
-      </motion.div>
+        </nav>
+      </div>
     </header>
   );
 }

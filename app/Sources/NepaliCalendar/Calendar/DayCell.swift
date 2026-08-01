@@ -1,20 +1,5 @@
 import SwiftUI
 import BSCore
-
-/// One day in the month grid. State is composed externally — this view is
-/// pure presentational so the grid can drive it from any source (events,
-/// EventKit overlay, festivals layer, panchanga layer).
-///
-/// Visual semantics:
-///   - Today           → BS numeral in `accentToday` (red), semibold weight
-///   - Selected        → soft blue-tinted pill, primary numerals
-///   - Today + Selected → pill + red numeral (color signal survives the fill)
-///   - Holiday         → amber dot, top-right
-///   - Saait           → soft green dot, bottom-right
-///   - Weekend column  → muted weekend foreground (NOT alert red); today's
-///                       red overrides the weekend hue so weekends-that-are-
-///                       today still read as today first.
-///   - Events          → row of small colored dots, bottom-center
 struct DayCell: View {
     struct ViewState: Equatable {
         var bsDay: Int
@@ -24,7 +9,6 @@ struct DayCell: View {
         var isWeekend: Bool
         var isHoliday: Bool
         var isSaait: Bool
-        /// Up to 3 user/system event colors rendered as tiny dots.
         var eventDotColors: [Color]
     }
 
@@ -33,19 +17,25 @@ struct DayCell: View {
     let onTap: () -> Void
 
     var body: some View {
+        Button(action: onTap) {
+            cellContent
+        }
+        .buttonStyle(DayCellButtonStyle())
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var cellContent: some View {
         ZStack {
-            // Selected fill — soft tint pill, sits beneath the numerals.
-            // Today no longer adds a ring on top; today's identity is now
-            // carried by the numeral color + weight so the cell stays clean
-            // whether or not it's also the selected day.
             if state.isSelected {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: Metrics.radiusDayCell, style: .continuous)
                     .fill(Color.accentSelectedFill)
             }
 
             VStack(spacing: 0) {
                 Text(NepaliFormatter.dayString(state.bsDay, locale: locale))
-                    .font(numeralFont)
+                    .font(.cellNumeral(isToday: state.isToday))
                     .monospacedDigit()
                     .foregroundStyle(numeralColor)
                     .padding(.top, 8)
@@ -57,7 +47,6 @@ struct DayCell: View {
                     .padding(.bottom, 6)
             }
 
-            // Holiday — amber dot, top-right.
             if state.isHoliday {
                 dot(.accentHoliday, size: 5)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
@@ -65,7 +54,6 @@ struct DayCell: View {
                     .padding(.trailing, 6)
             }
 
-            // Saait — soft green dot, bottom-right.
             if state.isSaait {
                 dot(.accentSaait, size: 5)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
@@ -73,7 +61,6 @@ struct DayCell: View {
                     .padding(.trailing, 6)
             }
 
-            // Event dots — bottom-center row, max 3.
             if !state.eventDotColors.isEmpty {
                 HStack(spacing: 2) {
                     ForEach(state.eventDotColors.prefix(3).indices, id: \.self) { i in
@@ -87,12 +74,8 @@ struct DayCell: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 52)
+        .frame(height: Metrics.dayCellHeight)
         .contentShape(Rectangle())
-        .onTapGesture(perform: onTap)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityLabel(accessibilityLabel)
     }
 
     @ViewBuilder
@@ -101,18 +84,9 @@ struct DayCell: View {
     }
 
     private var numeralColor: Color {
-        // Today owns the red — wins over weekend tint and the selected fill.
         if state.isToday { return .accentToday }
         if state.isWeekend { return .fgWeekend }
         return .fgPrimary
-    }
-
-    private var numeralFont: Font {
-        // Bump today to semibold; everything else stays at the regular
-        // weight defined by `.cellNumeral`.
-        state.isToday
-            ? Font.system(size: 18, weight: .semibold, design: .rounded)
-            : .cellNumeral
     }
 
     private var adColor: Color {
@@ -129,5 +103,20 @@ struct DayCell: View {
         if state.isHoliday  { parts.append("Holiday") }
         if state.isSaait    { parts.append("Auspicious") }
         return parts.joined(separator: ", ")
+    }
+}
+
+private struct DayCellButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(
+                configuration.isPressed && !reduceMotion ? Metrics.pressScale : 1
+            )
+            .animation(
+                reduceMotion ? nil : .easeOut(duration: 0.08),
+                value: configuration.isPressed
+            )
     }
 }

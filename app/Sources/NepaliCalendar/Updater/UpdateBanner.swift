@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// Slim banner that appears at the top of the popover when an update is
-/// available or an install is in progress. Hidden in `.idle`, `.upToDate`,
-/// and `.checking` to avoid pestering the user during routine polls.
 struct UpdateBanner: View {
     @ObservedObject var checker: UpdateChecker
 
@@ -21,36 +18,18 @@ struct UpdateBanner: View {
         }
     }
 
-    // MARK: - Rows
-
     private func availableRow(version: String) -> some View {
         HStack(spacing: 8) {
             Circle()
-                .fill(Color.green)
+                .fill(Color.accentSuccess)
                 .frame(width: 6, height: 6)
             Text("Update \(version) available")
-                .font(.system(size: 12, weight: .medium))
+                .font(.button)
             Spacer()
             Button("Later") { checker.dismiss() }
-                .buttonStyle(.plain)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(Color.primary.opacity(0.06))
-                )
+                .buttonStyle(BannerSecondaryButtonStyle())
             Button("Update") { checker.installAvailableUpdate() }
-                .buttonStyle(.plain)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(
-                    RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(Color.accentColor)
-                )
+                .buttonStyle(BannerPrimaryButtonStyle())
         }
         .modifier(BannerContainer())
     }
@@ -61,10 +40,10 @@ struct UpdateBanner: View {
                 ProgressView()
                     .controlSize(.small)
                 Text("Downloading update…")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.button)
                 Spacer()
                 Text("\(Int((progress * 100).rounded()))%")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
@@ -78,7 +57,7 @@ struct UpdateBanner: View {
         HStack(spacing: 8) {
             ProgressView().controlSize(.small)
             Text("Installing update — app will relaunch…")
-                .font(.system(size: 12, weight: .medium))
+                .font(.button)
             Spacer()
         }
         .modifier(BannerContainer())
@@ -88,25 +67,52 @@ struct UpdateBanner: View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.orange)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.badge)
             Text("Update failed: \(message)")
-                .font(.system(size: 11))
+                .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
             Spacer()
             Button("Retry") {
                 Task { await checker.checkForUpdates(userInitiated: true) }
             }
-            .buttonStyle(.plain)
-            .font(.system(size: 11, weight: .medium))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .fill(Color.primary.opacity(0.06))
-            )
+            .buttonStyle(BannerSecondaryButtonStyle())
         }
         .modifier(BannerContainer())
+    }
+}
+
+private struct BannerSecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 10)
+            .frame(minHeight: Metrics.hitAreaMin)
+            .background(
+                RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                    .fill(Color.surfaceHover)
+            )
+            .contentShape(Rectangle())
+            .scaleEffect(configuration.isPressed ? Metrics.pressScale : 1)
+            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
+    }
+}
+
+private struct BannerPrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.badge)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 12)
+            .frame(minHeight: Metrics.hitAreaMin)
+            .background(
+                RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                    .fill(Color.accentSelected)
+            )
+            .contentShape(Rectangle())
+            .scaleEffect(configuration.isPressed ? Metrics.pressScale : 1)
+            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
     }
 }
 
@@ -116,13 +122,10 @@ private struct BannerContainer: ViewModifier {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.primary.opacity(0.05))
+                RoundedRectangle(cornerRadius: Metrics.radiusCard, style: .continuous)
+                    .fill(Color.surfaceElevated)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
-            )
+            .cardShadow()
             .padding(.horizontal, 12)
             .padding(.top, 10)
     }

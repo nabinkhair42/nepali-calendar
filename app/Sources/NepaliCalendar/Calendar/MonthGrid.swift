@@ -1,13 +1,5 @@
 import SwiftUI
 import BSCore
-
-/// 7-column × 6-row month grid for a single BS month. Renders the weekday
-/// header followed by 42 cells; trailing nil slots become invisible
-/// spacers so the grid height is stable across 28/29/30/31/32-day months.
-///
-/// Pure: receives `viewing`, `today`, `selected`, `locale`, and emits a
-/// selection callback. Holds no state of its own — the popover wires it
-/// to the app-level state.
 struct MonthGrid: View {
     let viewing: BSDate
     let today: BSDate
@@ -17,7 +9,10 @@ struct MonthGrid: View {
 
     @EnvironmentObject private var festivalDB: FestivalDatabase
 
-    private static let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+    private static let columns = Array(
+        repeating: GridItem(.flexible(), spacing: Metrics.gridSpacing),
+        count: 7
+    )
     private static let weekendIndices: Set<Int> = [0, 6]
 
     private var slots: [BSDate?] {
@@ -32,10 +27,14 @@ struct MonthGrid: View {
         return arr
     }
 
+    private var monthKey: String {
+        "\(viewing.year)-\(viewing.month)"
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             WeekdayHeader(locale: locale)
-            LazyVGrid(columns: Self.columns, spacing: 4) {
+            LazyVGrid(columns: Self.columns, spacing: Metrics.gridSpacing) {
                 ForEach(Array(slots.enumerated()), id: \.offset) { idx, day in
                     if let day = day {
                         DayCell(
@@ -44,11 +43,12 @@ struct MonthGrid: View {
                             onTap: { onSelect(day) }
                         )
                     } else {
-                        Color.clear.frame(height: 52)
+                        Color.clear.frame(height: Metrics.dayCellHeight)
                     }
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.2), value: monthKey)
     }
 
     private func viewState(for day: BSDate, columnIndex: Int) -> DayCell.ViewState {
@@ -71,7 +71,7 @@ struct MonthGrid: View {
             isSelected: selected == day,
             isWeekend: Self.weekendIndices.contains(columnIndex),
             isHoliday: isHoliday,
-            isSaait: false,                 // wired in Tier 1.5 (SaaitCalculator)
+            isSaait: false,
             eventDotColors: Array(observanceColors)
         )
     }

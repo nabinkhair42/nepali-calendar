@@ -2,9 +2,6 @@ import SwiftUI
 import AppKit
 import BSCore
 
-/// Single settings panel — owns language, login behavior, the keyboard-
-/// shortcuts cheatsheet, and about/quit. Replaces the popover's calendar
-/// content in-place; the back button (or Esc, or ⌘,) returns to the calendar.
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
     @EnvironmentObject var updateChecker: UpdateChecker
@@ -30,7 +27,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 0) {
             header
 
-            Divider().opacity(0.18)
+            Divider().overlay(Color.dividerSubtle)
 
             VStack(alignment: .leading, spacing: 18) {
                 languageSection
@@ -44,14 +41,12 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
 
-            Divider().opacity(0.18)
+            Divider().overlay(Color.dividerSubtle)
 
             footer
         }
         .onAppear { loginManager.refresh() }
     }
-
-    // MARK: - Header
 
     private var header: some View {
         HStack(spacing: 8) {
@@ -60,15 +55,14 @@ struct SettingsView: View {
                 .help("Back to calendar · Esc")
 
             Text("Settings")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.heading)
+                .headingStyle()
             Spacer()
         }
         .padding(.horizontal, 14)
         .padding(.top, 12)
         .padding(.bottom, 10)
     }
-
-    // MARK: - Sections
 
     private var languageSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -97,11 +91,6 @@ struct SettingsView: View {
         }
     }
 
-    /// Appears only when a second copy of the app exists on disk. The
-    /// auto-updater only knows how to replace the currently-running bundle,
-    /// so any other install paths (manual drag-installs, leftover dev
-    /// builds, etc.) survive forever and show up alongside the real app
-    /// in Spotlight/Launchpad. This section lets the user clean them out.
     private var duplicatesSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             SectionTitle("Installation")
@@ -109,7 +98,7 @@ struct SettingsView: View {
                 Text(installation.duplicates.count == 1
                      ? "Found another copy of Nepali Calendar on this Mac."
                      : "Found \(installation.duplicates.count) other copies of Nepali Calendar on this Mac.")
-                    .font(.system(size: 11))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -121,20 +110,17 @@ struct SettingsView: View {
 
                 if let error = installation.lastError {
                     Text(error)
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundStyle(Color.accentHoliday)
                         .padding(.top, 2)
                 }
             }
             .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.primary.opacity(0.04))
+                RoundedRectangle(cornerRadius: Metrics.radiusCard, style: .continuous)
+                    .fill(Color.surfaceElevated)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
-            )
+            .cardShadow()
         }
     }
 
@@ -145,7 +131,7 @@ struct SettingsView: View {
                 ForEach(shortcutRows.indices, id: \.self) { i in
                     HStack {
                         Text(shortcutRows[i].label)
-                            .font(.system(size: 12))
+                            .font(.button)
                             .foregroundStyle(.primary)
                         Spacer()
                         HStack(spacing: 3) {
@@ -156,7 +142,7 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 7)
                     if i < shortcutRows.count - 1 {
-                        Divider().opacity(0.10)
+                        Divider().overlay(Color.dividerSubtle)
                     }
                 }
             }
@@ -167,14 +153,12 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 4) {
             SectionTitle("About")
             Text("Nepali Calendar")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.button.weight(.semibold))
             Text("Version \(versionString)")
-                .font(.system(size: 11))
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
     }
-
-    // MARK: - Footer
 
     private var footer: some View {
         HStack {
@@ -186,14 +170,12 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Pieces
-
 private struct SectionTitle: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .semibold))
+            .font(.badge)
             .foregroundStyle(.secondary)
     }
 }
@@ -208,10 +190,10 @@ private struct SwitchRow: View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.button)
                 if let sub = subtitle {
                     Text(sub)
-                        .font(.system(size: 11))
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -233,17 +215,14 @@ private struct KeyCap: View {
     let text: String
     var body: some View {
         Text(text)
-            .font(.system(size: 10, weight: .semibold, design: .rounded))
+            .font(.badge)
             .frame(minWidth: 20, minHeight: 20)
             .padding(.horizontal, 4)
             .background(
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .fill(Color.primary.opacity(0.08))
+                    .fill(Color.surfaceHover)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.10), lineWidth: 0.5)
-            )
+            .cardShadow()
             .foregroundStyle(.primary)
     }
 }
@@ -258,29 +237,26 @@ private struct LanguageSegmented: View {
             segment(label: "English", isSelected: value == .english) { onChange(.english) }
         }
         .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color.primary.opacity(0.06))
+            RoundedRectangle(cornerRadius: Metrics.radiusCard, style: .continuous)
+                .fill(Color.surfaceElevated)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
-        )
+        .cardShadow()
     }
 
     private func segment(label: String, isSelected: Bool, onTap: @escaping () -> Void) -> some View {
         Button(action: onTap) {
             Text(label)
-                .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
+                .font(isSelected ? .button.weight(.semibold) : .button)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
                 .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(isSelected ? Color.primary.opacity(0.12) : Color.clear)
+                    RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                        .fill(isSelected ? Color.surfacePressed : Color.clear)
                         .padding(2)
                 )
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ToolbarButtonStyle())
     }
 }
 
@@ -292,16 +268,16 @@ private struct DuplicateRow: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "doc.on.doc")
-                .font(.system(size: 11, weight: .regular))
+                .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(width: 14)
             VStack(alignment: .leading, spacing: 1) {
                 Text(url.lastPathComponent)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .lineLimit(1)
                     .truncationMode(.middle)
                 Text(url.deletingLastPathComponent().path)
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -309,26 +285,24 @@ private struct DuplicateRow: View {
             Spacer(minLength: 6)
             Button(action: onTrash) {
                 Text("Move to Trash")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .foregroundStyle(hovered ? Color.accentHoliday : Color.fgSecondary)
                     .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .frame(minHeight: Metrics.hitAreaMin)
                     .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(hovered ? Color.accentHoliday.opacity(0.10) : Color.primary.opacity(0.05))
+                        RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                            .fill(hovered ? Color.accentHoliday.opacity(0.10) : Color.surfaceHover)
                     )
                     .contentShape(Rectangle())
                     .animation(.easeOut(duration: 0.12), value: hovered)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ToolbarButtonStyle())
             .onHover { hovered = $0 }
             .help("Move \(url.path) to Trash")
         }
     }
 }
 
-/// Back-to-calendar arrow used in the Settings header. Flat at rest, soft
-/// hover; matches the macOS toolbar-button idiom.
 private struct BackButton: View {
     let action: () -> Void
     @State private var hovered = false
@@ -336,23 +310,21 @@ private struct BackButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "arrow.left")
-                .font(.system(size: 12, weight: .medium))
+                .font(.button)
                 .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
-                .frame(width: 26, height: 24)
+                .frame(width: Metrics.hitAreaMin, height: Metrics.hitAreaMin)
                 .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                    RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                        .fill(hovered ? Color.surfaceHover : Color.clear)
                 )
                 .contentShape(Rectangle())
                 .animation(.easeOut(duration: 0.12), value: hovered)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ToolbarButtonStyle())
+        .onHover { hovered = $0 }
     }
 }
 
-/// Quit action shown bottom-right of Settings. Matches the rest of the
-/// app's toolbar-button idiom — flat at rest, neutral soft hover. The ⌘Q
-/// shortcut is documented in the Shortcuts list above and in the tooltip.
 private struct QuitButton: View {
     @State private var hovered = false
 
@@ -361,18 +333,18 @@ private struct QuitButton: View {
             NSApp.terminate(nil)
         } label: {
             Text("Quit")
-                .font(.system(size: 12, weight: .medium))
+                .font(.button)
                 .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .frame(minWidth: Metrics.hitAreaMin, minHeight: Metrics.hitAreaMin)
                 .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                    RoundedRectangle(cornerRadius: Metrics.radiusControl + 1, style: .continuous)
+                        .fill(hovered ? Color.surfaceHover : Color.clear)
                 )
                 .contentShape(Rectangle())
                 .animation(.easeOut(duration: 0.12), value: hovered)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ToolbarButtonStyle())
         .onHover { hovered = $0 }
         .help("Quit Nepali Calendar · ⌘Q")
     }

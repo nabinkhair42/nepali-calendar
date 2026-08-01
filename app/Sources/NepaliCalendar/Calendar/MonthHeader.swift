@@ -1,11 +1,5 @@
 import SwiftUI
 import BSCore
-
-/// Month title + AD subtitle on the left; flat chevron buttons (prev /
-/// today / next) on the right. The buttons are intentionally borderless
-/// at rest — the segmented-pill look was reading as a permanently
-/// "pressed" control. Grouping comes from proximity, hover gives a
-/// per-button rounded highlight.
 struct MonthHeader: View {
     let viewing: BSDate
     let locale: Locale_
@@ -18,7 +12,7 @@ struct MonthHeader: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(NepaliFormatter.headerLabel(viewing, locale: locale))
                     .font(.display)
-                    .tracking(-0.4)
+                    .headingStyle()
                     .foregroundStyle(Color.fgPrimary)
                 Text(NepaliFormatter.adSubtitle(forBSMonth: viewing))
                     .font(.label)
@@ -58,20 +52,28 @@ private struct NavButton: View {
     let action: () -> Void
     @State private var hovered = false
 
+    private var isChevron: Bool {
+        system.hasPrefix("chevron")
+    }
+
     var body: some View {
         Button(action: action) {
             Image(systemName: system)
-                .font(.system(size: 12, weight: .medium))
+                .font(.button)
+                .offset(x: isChevron ? -0.5 : 0)
                 .foregroundStyle(hovered ? Color.fgPrimary : Color.fgSecondary)
-                .frame(width: 28, height: 24)
+                .frame(
+                    width: Metrics.hitAreaMin,
+                    height: Metrics.hitAreaMin
+                )
                 .background(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(hovered ? Color.primary.opacity(0.08) : Color.clear)
+                    RoundedRectangle(cornerRadius: Metrics.radiusControl, style: .continuous)
+                        .fill(hovered ? Color.surfaceHover : Color.clear)
                 )
                 .contentShape(Rectangle())
                 .animation(.easeOut(duration: 0.12), value: hovered)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ToolbarButtonStyle())
         .onHover { hovered = $0 }
     }
 }

@@ -1,12 +1,5 @@
 import SwiftUI
 import BSCore
-
-/// Detail panel for the currently-selected day. Shows weekday name +
-/// full BS/AD date and any festivals/observances that fall on this date.
-///
-/// Reserved rows for Tithi / Nakshatra / Yog / Karana, Saait status, and
-/// EventKit-overlay events render as soon as their data layers ship
-/// (Tier 1.2, 1.5, and 2.12 respectively).
 struct SelectedDayPanel: View {
     let date: BSDate
     let locale: Locale_
@@ -51,12 +44,13 @@ struct SelectedDayPanel: View {
             }
             Text(bsDateString)
                 .font(.bodyText)
+                .monospacedDigit()
                 .foregroundStyle(Color.fgSecondary)
                 .padding(.top, -2)
 
             if !festivals.isEmpty {
                 Divider()
-                    .opacity(0.18)
+                    .overlay(Color.dividerSubtle)
                     .padding(.top, 8)
                     .padding(.bottom, 2)
                 VStack(alignment: .leading, spacing: 7) {
@@ -83,13 +77,10 @@ private struct FestivalRow: View {
                 .fill(tintColor)
                 .frame(width: 6, height: 6)
             Text(festival.name(locale: locale))
-                .font(.system(size: 13, weight: .medium))
+                .font(.label)
                 .foregroundStyle(Color.fgPrimary)
                 .lineLimit(1)
             Spacer(minLength: 4)
-            // Only flag actual holidays — the "Observance" label that used to
-            // repeat for every cultural/international row was visual noise.
-            // The colored dot already carries the category signal.
             if festival.isHoliday {
                 HolidayChip()
             }
@@ -97,13 +88,10 @@ private struct FestivalRow: View {
     }
 }
 
-/// Holiday badge. Solid amber fill + white text — readable in both light
-/// and dark mode without depending on the popover surface luminance. The
-/// earlier amber-on-amber-tint version had no contrast against itself.
 private struct HolidayChip: View {
     var body: some View {
         Text("Holiday")
-            .font(.system(size: 10, weight: .semibold))
+            .font(.badge)
             .foregroundStyle(.white)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
