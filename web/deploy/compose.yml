@@ -1,0 +1,26 @@
+# Deployed to /opt/apps/calendar on the VM by .github/workflows/deploy.yml.
+# Secrets live in /opt/apps/calendar/.env on the VM (not in git).
+services:
+  app:
+    image: ghcr.io/nabinkhair42/calendar:${TAG:-latest}
+    container_name: calendar
+    restart: unless-stopped
+    env_file: .env
+    networks: [web]
+
+  # Replaces the Vercel cron: refresh the current BS year daily at 18:15 UTC (00:00 NPT).
+  cron:
+    image: alpine:3.22
+    restart: unless-stopped
+    env_file: .env
+    command:
+      - sh
+      - -c
+      - |
+        echo "15 18 * * * wget -qO- --header='Authorization: Bearer $$CRON_SECRET' http://calendar:3000/api/cron/refresh" | crontab -
+        exec crond -f
+    networks: [web]
+
+networks:
+  web:
+    external: true
